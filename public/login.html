@@ -8,18 +8,19 @@
 <style>
   body {
     background:
-      radial-gradient(900px 400px at 50% 0%, rgba(255,182,39,.04), transparent 60%),
+      radial-gradient(900px 400px at 50% 0%, rgba(229,29,42,.06), transparent 60%),
       var(--bg-base);
   }
   .auth-logo {
     display: flex; align-items: center; justify-content: center; gap: 10px;
     margin-bottom: 22px; font-weight: 800; font-size: 18px; letter-spacing: .05em;
+    color: var(--tx);
   }
   .auth-logo .logo {
     width: 36px; height: 36px; border-radius: 10px;
-    background: conic-gradient(from 200deg,var(--gold),var(--green),var(--gold));
+    background: conic-gradient(from 200deg,var(--red),var(--green),var(--red));
     display: grid; place-items: center;
-    box-shadow: 0 0 16px rgba(255,182,39,.25);
+    box-shadow: 0 0 20px rgba(229,29,42,.35);
   }
   .step { display: none; }
   .step.on { display: block; }
@@ -28,7 +29,7 @@
     color: var(--tx-muted); font-size: 12px; text-decoration: none;
     margin-bottom: 14px; transition: .12s;
   }
-  .auth-back:hover { color: var(--gold); }
+  .auth-back:hover { color: var(--red); }
   .divider-or {
     display: flex; align-items: center; gap: 10px;
     color: var(--tx-muted); font-size: 12px; margin: 16px 0;
@@ -49,7 +50,7 @@
   }
   .plan-summary .ps-tier { font-size: 11px; color: var(--tx-faint); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
   .plan-summary .ps-name { font-size: 15px; font-weight: 700; }
-  .plan-summary .ps-price { font-family: var(--mono); color: var(--gold); font-size: 13px; float: right; margin-top: -20px; }
+  .plan-summary .ps-price { font-family: var(--mono); color: var(--red); font-size: 13px; font-weight: 600; float: right; margin-top: -20px; }
   .success-check { text-align: center; padding: 10px 0 20px; }
   .success-check .check { font-size: 52px; animation: popIn .5s cubic-bezier(.2,.9,.3,1.4); }
   @keyframes popIn { from{transform:scale(0)} to{transform:scale(1)} }
@@ -66,7 +67,7 @@
     background: none; border: none; color: var(--tx-muted); cursor: pointer;
     font-size: 14px; padding: 4px;
   }
-  .pw-toggle:hover { color: var(--gold); }
+  .pw-toggle:hover { color: var(--red); }
 </style>
 </head>
 <body>
