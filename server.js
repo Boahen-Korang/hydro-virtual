@@ -129,6 +129,27 @@ const sign = (payload) => jwt.sign(payload, JWT_SECRET, { expiresIn: '30d' });
 const norm = (e) => String(e || '').trim().toLowerCase();
 const hash = (pw) => bcrypt.hashSync(pw, 10);
 const check = (pw, h) => { try { return bcrypt.compareSync(pw, h); } catch { return false; } };
+
+const parsePrice = (label) => {
+  if (!label) return 0;
+  const s = String(label);
+
+  // Handle Red & Black packages
+  if (/red\s*&\s*black/i.test(s)) {
+    const match = s.match(/(\d+(?:\.\d+)?)\s*(?:k|ghs)?/i);
+    if (match) {
+      let n = parseFloat(match[1]);
+      if (/k/i.test(match[0])) n *= 1000;
+      return isNaN(n) ? 0 : n;
+    }
+  }
+
+  // Handle regular packages (GHS 300, GHS 500, etc.)
+  const cleaned = s.replace(/ghs/i, '').trim();
+  let n = parseFloat(cleaned);
+  if (/k/i.test(cleaned)) n *= 1000;
+  return isNaN(n) ? 0 : n;
+};
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function auth(role) {
