@@ -252,7 +252,6 @@
       </ul>
     </nav>
     <div class="nav-right">
-      <span class="status-chip"><span class="dot" aria-hidden="true"></span><span id="navClock">Next round 03:00</span></span>
       <a class="btn-cta-sm" href="login.html">Sign in</a>
     </div>
   </div>
@@ -530,20 +529,6 @@ tabs.forEach((t, idx) => t.addEventListener('click', () => renderFixture(idx)));
 // double rAF so the width transition actually fires on first load
 requestAnimationFrame(() => requestAnimationFrame(() => renderFixture(0)));
 
-// nav round-clock — reflects the stated 3-minute round cadence, pauses when tab isn't visible
-let remaining = 180;
-const clockChip = document.getElementById('navClock');
-function formatClock(){
-  const m = String(Math.floor(remaining / 60)).padStart(2, '0');
-  const s = String(remaining % 60).padStart(2, '0');
-  return `Next round ${m}:${s}`;
-}
-if (clockChip) clockChip.textContent = formatClock();
-setInterval(() => {
-  if (document.hidden || !clockChip) return;
-  remaining = remaining > 0 ? remaining - 1 : 180;
-  clockChip.textContent = formatClock();
-}, 1000);
 </script>
 </body>
 </html>
