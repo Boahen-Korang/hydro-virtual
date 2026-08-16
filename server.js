@@ -173,13 +173,6 @@ const wrap = (fn) => (req, res) => Promise.resolve(fn(req, res)).catch((e) => {
   res.status(500).json({ error: 'Server error' });
 });
 
-function parsePrice(label) {
-  if (!label) return 0;
-  const s = String(label).replace(/ghs/i, '').trim();
-  let n = parseFloat(s);
-  if (/k/i.test(s)) n *= 1000;
-  return isNaN(n) ? 0 : n;
-}
 
 function genCode(name) {
   const base = (name || 'PARTNER').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5) || 'PART';
