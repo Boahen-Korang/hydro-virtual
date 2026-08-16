@@ -257,7 +257,7 @@ app.post('/api/auth/register', wrap(async (req, res) => {
   const ref = String(req.body.ref || '').trim() || null;
   if (!name) return res.status(400).json({ error: 'Enter your name.' });
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Enter a valid email.' });
-  if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+  if (password.length < 12) return res.status(400).json({ error: 'Password must be at least 12 characters.' });
 
   const exists = await query('SELECT 1 FROM users WHERE email=$1', [email]);
   if (exists.rows.length) return res.status(409).json({ error: 'An account with this email already exists.' });
@@ -319,7 +319,7 @@ app.post('/api/auth/forgot', wrap(async (req, res) => {
 
 app.post('/api/auth/reset', wrap(async (req, res) => {
   const password = String(req.body.password || '');
-  if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+  if (password.length < 12) return res.status(400).json({ error: 'Password must be at least 12 characters.' });
   let decoded;
   try { decoded = jwt.verify(String(req.body.token || ''), JWT_SECRET); } catch {
     return res.status(400).json({ error: 'This reset link is invalid or has expired. Request a new one.' });
@@ -543,7 +543,7 @@ app.post('/api/partner/register', wrap(async (req, res) => {
   const password = String(req.body.password || '');
   if (!name) return res.status(400).json({ error: 'Enter your full name.' });
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Enter a valid email.' });
-  if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+  if (password.length < 12) return res.status(400).json({ error: 'Password must be at least 12 characters.' });
 
   const exists = await query('SELECT 1 FROM partners WHERE email=$1', [email]);
   if (exists.rows.length) return res.status(409).json({ error: 'A partner with this email already exists.' });
