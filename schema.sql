@@ -23,9 +23,6 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS unlimited_until BIGINT;
 -- before then are grandfathered in as paid
 ALTER TABLE users ADD COLUMN IF NOT EXISTS reg_fee_paid BOOLEAN NOT NULL DEFAULT false;
 UPDATE users SET reg_fee_paid = true WHERE reg_fee_paid = false AND created_at < TIMESTAMPTZ '2026-08-11 00:00:00+00';
--- add foreign key constraint and index for partner relationship
-CREATE INDEX IF NOT EXISTS idx_users_partner ON users(partner);
-ALTER TABLE users ADD CONSTRAINT fk_users_partner FOREIGN KEY (partner) REFERENCES partners(code) ON DELETE SET NULL;
 
 
 CREATE TABLE IF NOT EXISTS partners (
@@ -44,6 +41,13 @@ CREATE TABLE IF NOT EXISTS partners (
 ALTER TABLE partners ADD COLUMN IF NOT EXISTS commission NUMERIC NOT NULL DEFAULT 10;
 -- partner's own revenue counter reset point (display only; purchases stay stored)
 ALTER TABLE partners ADD COLUMN IF NOT EXISTS revenue_cleared_at TIMESTAMPTZ;
+-- add foreign key constraint and index for partner relationship (after partners table exists)
+CREATE INDEX IF NOT EXISTS idx_users_partner ON users(partner);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'fk_users_partner') THEN
+    ALTER TABLE users ADD CONSTRAINT fk_users_partner FOREIGN KEY (partner) REFERENCES partners(code) ON DELETE SET NULL;
+  END IF;
+END $$;
 
 CREATE TABLE IF NOT EXISTS pushed_picks (
   id            SERIAL PRIMARY KEY,
