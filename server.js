@@ -269,10 +269,13 @@ app.post('/api/auth/register', wrap(async (req, res) => {
     const p = await query('SELECT code FROM partners WHERE code=$1', [ref]);
     if (p.rows.length) partner = ref;
   }
+  const passwordHash = hash(password);
+  console.log(`[REGISTER] Creating account for ${email}, password length: ${password.length}`);
   const { rows } = await query(
     'INSERT INTO users (email,name,pw_hash,ref,partner) VALUES ($1,$2,$3,$4,$5) RETURNING *',
-    [email, name, hash(password), ref, partner]
+    [email, name, passwordHash, ref, partner]
   );
+  console.log(`[REGISTER] Account created, stored pw_hash length: ${rows[0].pw_hash.length}`);
   await query('INSERT INTO credits (email,amount) VALUES ($1,0) ON CONFLICT (email) DO NOTHING', [email]);
   const user = userOut(rows[0]);
   res.json({ token: sign({ email, role: 'member' }), user });
@@ -281,9 +284,20 @@ app.post('/api/auth/register', wrap(async (req, res) => {
 app.post('/api/auth/login', wrap(async (req, res) => {
   const email = norm(req.body.email);
   const password = String(req.body.password || '');
+  console.log(`[LOGIN] Attempting login for: ${email}`);
   const { rows } = await query('SELECT * FROM users WHERE email=$1', [email]);
   const u = rows[0];
-  if (!u || !check(password, u.pw_hash)) return res.status(401).json({ error: 'Wrong email or password.' });
+  console.log(`[LOGIN] User found: ${!!u}, pw_hash exists: ${!!(u && u.pw_hash)}`);
+  if (!u) {
+    console.log(`[LOGIN] User not found in database`);
+    return res.status(401).json({ error: 'Wrong email or password.' });
+  }
+  const passwordMatch = check(password, u.pw_hash);
+  console.log(`[LOGIN] Password check result: ${passwordMatch}`);
+  if (!passwordMatch) {
+    console.log(`[LOGIN] Password mismatch for ${email}`);
+    return res.status(401).json({ error: 'Wrong email or password.' });
+  }
   res.json({ token: sign({ email, role: 'member' }), user: userOut(u) });
 }));
 
