@@ -2,30 +2,66 @@
    Virtual Oracle — Shared Stylesheet
    =================================================== */
 :root {
-  /* game */
+  /* primary colors — all naming variants unified */
   --red:        #E51D2A;
+  --blood:      #E51D2A;
+  --crimson:    #E51D2A;
   --black:      #14151A;
-  /* backgrounds */
+  --green:      #22C55E;
+  --alert:      #FF3B5C;
+  --ember:      #FF3B5C;
+
+  /* backgrounds — unified naming (all variants point to same values) */
   --bg:         #0C0D12;
+  --bg-base:    #0C0D12;
+  --void:       #0C0D12;
+
   --surface:    #171922;
+  --bg-surface: #171922;
+  --panel:      #171922;
+
   --surface2:   #21242F;
+  --bg-elev:    #21242F;
+  --panel2:     #21242F;
+
   --surface3:   #2E323F;
+
+  /* borders & dividers */
   --border:     #2E323F;
   --border2:    #3D424F;
-  /* accents & states */
-  --gold:       #FFB627;
-  --green:      #22C55E;
+  --gore:       #2E323F;
+
+  /* accents */
+  --gold:       #E51D2A;
   --amber:      #FFB627;
-  --alert:      #FF3B5C;
+  --sulfur:     #FFB627;
+
   /* text */
   --chalk:      #FFFFFF;
   --tx:         #FFFFFF;
+  --bone:       #FFFFFF;
+  --ink:        #FFFFFF;
+
   --tx-muted:   #A0A5B8;
   --muted:      #A0A5B8;
+  --ash:        #A0A5B8;
+  --gray:       #A0A5B8;
+
   --tx-faint:   #6B7080;
+  --ash-dim:    #6B7080;
+  --gray-dim:   #6B7080;
+
   --blue:       #4FD1FF;
+
+  /* fonts — all naming variants */
   --mono: ui-monospace,"SF Mono","Roboto Mono",Menlo,Consolas,monospace;
+  --font-mono: ui-monospace,"SF Mono","Roboto Mono",Menlo,Consolas,monospace;
   --sans: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --font-sans: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --body: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --ui: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+
+  /* spacing */
   --r:  14px;
   --rs: 9px;
 }
