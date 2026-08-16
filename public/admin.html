@@ -104,28 +104,32 @@
   .section-lead p{font-size:13px;color:var(--ash-dim);margin-top:3px}
 
   /* ---- Stat cards ---- */
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(212px,1fr));gap:16px;margin-bottom:30px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin-bottom:32px}
   .stat{
-    background:#FFFFFF;
-    border:1px solid rgba(228,24,39,.16);border-radius:11px;
-    padding:20px 20px 16px;position:relative;overflow:hidden;transition:.2s ease
+    background:linear-gradient(135deg,rgba(255,255,255,.97),rgba(252,253,254,.97));
+    border:1.5px solid rgba(228,24,39,.2);border-radius:13px;
+    padding:24px;position:relative;overflow:hidden;transition:.25s cubic-bezier(.2,.7,.2,1);
+    box-shadow:0 4px 12px rgba(25,30,45,.06),inset 0 1px 0 rgba(255,255,255,.6)
   }
-  .stat::before{content:"";position:absolute;left:0;top:0;right:0;height:2px;
-    background:linear-gradient(90deg,var(--crimson),rgba(228,24,39,0) 72%);opacity:.75}
+  .stat::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--crimson),rgba(228,24,39,0) 65%);opacity:.8}
   .stat::after{content:"";position:absolute;inset:0;pointer-events:none;
-    background:radial-gradient(280px 150px at 105% -10%,rgba(228,24,39,.09),transparent 60%)}
-  .stat:hover{transform:translateY(-3px);border-color:rgba(228,24,39,.42);
-    box-shadow:0 16px 36px rgba(25,30,45,.12),0 0 24px rgba(228,24,39,.1)}
-  .stat-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;position:relative}
-  .stat .label{font-family:var(--ui);text-transform:uppercase;letter-spacing:.18em;font-size:10.5px;color:var(--ash-dim)}
-  .stat-ico{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:16px;
-    color:var(--crimson);background:rgba(228,24,39,.1);border:1px solid rgba(228,24,39,.26);flex:0 0 auto}
-  .stat-ico.gold{color:var(--sulfur);background:rgba(217,164,65,.1);border-color:rgba(217,164,65,.3)}
-  .stat .val{font-family:var(--display);font-weight:900;font-size:33px;line-height:1;color:var(--bone);position:relative}
-  .stat .val.crimson{color:var(--crimson);text-shadow:0 0 20px rgba(228,24,39,.35)}
-  .stat .val.gold{color:var(--sulfur);text-shadow:0 0 20px rgba(217,164,65,.25)}
-  .stat-foot{margin-top:15px;padding-top:13px;border-top:1px solid rgba(25,28,34,.07);position:relative}
-  .stat .sub{font-family:var(--ui);font-size:11px;letter-spacing:.06em;color:var(--ash)}
+    background:radial-gradient(320px 160px at 110% -15%,rgba(228,24,39,.11),transparent 65%);opacity:0;transition:opacity .25s}
+  .stat:hover{transform:translateY(-4px);border-color:rgba(228,24,39,.35);
+    box-shadow:0 20px 48px rgba(25,30,45,.15),0 0 32px rgba(228,24,39,.15),inset 0 1px 0 rgba(255,255,255,.8)}
+  .stat:hover::after{opacity:1}
+  .stat-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px;position:relative}
+  .stat .label{font-family:var(--ui);text-transform:uppercase;letter-spacing:.15em;font-size:11px;font-weight:600;color:var(--ash-dim);flex:1}
+  .stat-ico{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:20px;
+    color:var(--crimson);background:rgba(228,24,39,.12);border:1.5px solid rgba(228,24,39,.3);flex:0 0 auto;transition:.25s}
+  .stat:hover .stat-ico{background:rgba(228,24,39,.18);border-color:rgba(228,24,39,.45);transform:scale(1.08)}
+  .stat-ico.gold{color:var(--sulfur);background:rgba(217,164,65,.12);border-color:rgba(217,164,65,.35)}
+  .stat:hover .stat-ico.gold{background:rgba(217,164,65,.2);border-color:rgba(217,164,65,.5)}
+  .stat .val{font-family:var(--display);font-weight:900;font-size:clamp(28px,4.5vw,36px);line-height:1.1;color:var(--bone);position:relative;margin-bottom:4px}
+  .stat .val.crimson{color:var(--crimson);text-shadow:0 0 24px rgba(228,24,39,.35)}
+  .stat .val.gold{color:var(--sulfur);text-shadow:0 0 22px rgba(217,164,65,.28)}
+  .stat-foot{margin-top:16px;padding-top:14px;border-top:1px solid rgba(25,28,34,.08);position:relative}
+  .stat .sub{font-family:var(--ui);font-size:11px;letter-spacing:.06em;color:var(--ash-dim);font-weight:500}
 
   /* ---- Overview activity ---- */
   .ov-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -949,13 +953,13 @@ function renderStats(){
   const today = (_daily && _daily.length) ? _daily[_daily.length - 1] : { revenue: 0, count: 0 };
 
   const cards = [
-    { label:'Total Members', val: totalUsers, cls:'', ico:'☷', sub: active+' active subscription'+(active===1?'':'s') },
-    { label:'Revenue', val: fmtMoney(revenue), cls:'gold', ico:'₵', icoCls:'gold', sub: txCount+' transaction'+(txCount===1?'':'s') },
-    { label:"Today's Revenue", val: fmtMoney(today.revenue), cls:'gold', ico:'📅', icoCls:'gold', sub: today.count+' transaction'+(today.count===1?'':'s')+' today' },
-    { label:'Nigeria Revenue', val: fmtMoney(ngRevenue), cls:'', ico:'🇳🇬', sub: ngSub },
-    { label:'Transactions', val: txCount, cls:'crimson', ico:'⇄', sub:'all-time purchases' },
-    { label:'Credits Live', val: outstanding + (hasUnlim?' +∞':''), cls:'', ico:'⚡', sub:'unused predictions' },
-    { label:'Seed Matches', val: getResults().length, cls:'', ico:'⚽', sub:'in prediction pool' },
+    { label:'Registered Members', val: totalUsers, cls:'crimson', ico:'👥', sub: active+' active subscriber'+(active===1?'':'s') },
+    { label:'All-Time Revenue', val: fmtMoney(revenue), cls:'gold', ico:'₵', icoCls:'gold', sub: txCount+' transaction'+(txCount===1?'':'s') },
+    { label:"Today's Revenue", val: fmtMoney(today.revenue), cls:'gold', ico:'📊', icoCls:'gold', sub: today.count+' transaction'+(today.count===1?'':'s')+' today' },
+    { label:'Nigeria Revenue', val: fmtMoney(ngRevenue), cls:'crimson', ico:'🇳🇬', sub: ngSub+' from Nigeria' },
+    { label:'Total Transactions', val: txCount, cls:'', ico:'💳', sub:'all-time purchases' },
+    { label:'Outstanding Credits', val: outstanding + (hasUnlim?' +∞':''), cls:'', ico:'⭐', sub:'active predictions' },
+    { label:'Prediction Seeds', val: getResults().length, cls:'', ico:'🎯', sub:'in the pool' },
   ];
   document.getElementById('stats').innerHTML = cards.map(c => `
     <div class="stat">
