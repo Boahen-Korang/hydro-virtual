@@ -57,9 +57,21 @@
   .success-check h3 { margin: 12px 0 6px; font-size: 20px; }
   .success-check p { font-size: 13px; color: var(--muted); margin: 0; }
   .error-msg {
-    background: rgba(229,29,42,.15); border: 1px solid rgba(229,29,42,.4);
-    border-radius: var(--rs); padding: 10px 12px;
-    font-size: 12px; color: var(--alert); margin-bottom: 14px; display: none;
+    background: rgba(229,29,42,.2); border: 1.5px solid rgba(229,29,42,.6);
+    border-radius: var(--rs); padding: 12px 14px;
+    font-size: 13px; color: #FF5C5C; margin-bottom: 16px; display: none;
+    animation: slideIn .3s cubic-bezier(.2,.7,.2,1);
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(229,29,42,.2);
+  }
+  .error-msg::before {
+    content: "⚠ ";
+    font-weight: 700;
+    margin-right: 6px;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
   .pw-wrap { position: relative; }
   .pw-toggle {
@@ -68,6 +80,13 @@
     font-size: 14px; padding: 4px;
   }
   .pw-toggle:hover { color: var(--red); }
+  .form-input.error {
+    border-color: #FF5C5C !important;
+    background-color: rgba(229,29,42,.08) !important;
+  }
+  .form-input.error:focus {
+    box-shadow: 0 0 0 3px rgba(229,29,42,.25) !important;
+  }
 </style>
 </head>
 <body>
@@ -346,6 +365,8 @@ async function doLogin(){
   const email = document.getElementById('l-email').value.trim();
   const pw    = document.getElementById('l-pw').value;
   const errEl = document.getElementById('login-err');
+  const emailEl = document.getElementById('l-email');
+  const pwEl = document.getElementById('l-pw');
   const btn   = event.target;
 
   console.log('[LOGIN] Button clicked, starting login attempt for:', email);
@@ -354,7 +375,10 @@ async function doLogin(){
 
   if(!email || !pw){
     console.warn('[LOGIN] Missing email or password');
-    errEl.textContent = 'Please fill in all fields.'; errEl.style.display=''; return;
+    errEl.textContent = 'Please fill in all fields.';
+    errEl.style.display = '';
+    shake(emailEl);
+    return;
   }
 
   btn.disabled = true;
@@ -386,9 +410,33 @@ async function doLogin(){
     console.error('[LOGIN] Error:', e);
     btn.disabled = false;
     btn.textContent = 'Log in';
-    errEl.textContent = e.message || 'Incorrect email or password.'; errEl.style.display='';
+    errEl.textContent = e.message || 'Incorrect email or password.';
+    errEl.style.display = '';
+    emailEl.classList.add('error');
+    pwEl.classList.add('error');
+    shake(pwEl);
+    setTimeout(() => {
+      emailEl.classList.remove('error');
+      pwEl.classList.remove('error');
+    }, 2000);
   }
 }
+
+function shake(el){
+  if(!el) return;
+  el.style.animation = 'none';
+  setTimeout(() => { el.style.animation = 'shake .4s'; }, 10);
+}
+
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+    20%, 40%, 60%, 80% { transform: translateX(3px); }
+  }
+`;
+document.head.appendChild(style);
 
 /* ---- Register: create the account, then go straight to the packages page ---- */
 async function goToPlans(){
