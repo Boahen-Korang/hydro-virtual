@@ -5,7 +5,7 @@ services:
     name: virtualedge
     runtime: node
     plan: starter                  # paid (~$7/mo): always-on, no cold-start sleep
-    buildCommand: npm install
+    buildCommand: npm install && node db.js --init
     startCommand: npm start
     healthCheckPath: /
     envVars:
