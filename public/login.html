@@ -369,12 +369,9 @@ async function doLogin(){
   const pwEl = document.getElementById('l-pw');
   const btn   = event.target;
 
-  console.log('[LOGIN] Button clicked, starting login attempt for:', email);
-
   errEl.style.display = 'none';
 
   if(!email || !pw){
-    console.warn('[LOGIN] Missing email or password');
     errEl.textContent = 'Please fill in all fields.';
     errEl.style.display = '';
     shake(emailEl);
@@ -385,29 +382,20 @@ async function doLogin(){
   btn.textContent = 'Logging in…';
 
   try {
-    console.log('[LOGIN] Calling VE.login...');
     await VE.login(email, pw);
-    console.log('[LOGIN] Login successful, fetching user info...');
     let me = null;
-    try { me = await VE.me(); } catch(e){ console.warn('[LOGIN] Error fetching me:', e); }
+    try { me = await VE.me(); } catch(e){}
     const u = (me && me.user) || {};
-    console.log('[LOGIN] User data:', u);
-    // Signup gates first: registration fee, then a linked SportyBet account
     if(me && u.regFeePaid === false){
-      console.log('[LOGIN] Redirecting to pricing (reg fee not paid)');
       window.location.href = 'pricing.html'; return;
     }
     if(me && !u.sportyAccount){
-      console.log('[LOGIN] Redirecting to sporty connect');
       showStep('step-sporty'); updateSportyHint(); return;
     }
-    // Then: predictions left → dashboard, otherwise the packages page
     const credits = (me && me.credits) || 0;
     const unlimited = !!(u.unlimitedUntil && Date.now() < u.unlimitedUntil);
-    console.log('[LOGIN] Redirecting to', (credits > 0 || unlimited) ? 'dashboard' : 'pricing');
     window.location.href = (credits > 0 || unlimited) ? 'dashboard.html' : 'pricing.html';
   } catch(e){
-    console.error('[LOGIN] Error:', e);
     btn.disabled = false;
     btn.textContent = 'Log in';
     errEl.textContent = e.message || 'Incorrect email or password.';
