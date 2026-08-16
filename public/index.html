@@ -210,9 +210,12 @@
   .plan.featured .plan-btn{background:var(--red); color:var(--tx); border-color:var(--red);}
 
   /* ===== partners ===== */
-  .partners-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--border); border:1px solid var(--border); margin-top:40px;}
+  .partners-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--border); border:1px solid var(--border); margin-top:40px; overflow:hidden;}
   @media (max-width:900px){ .partners-grid{grid-template-columns:1fr;} }
-  .partner-card{display:flex; flex-direction:column; justify-content:space-between; min-height:280px;}
+  .partner-card{display:flex; flex-direction:column; justify-content:space-between; transition:transform .3s, filter .3s;}
+  .partner-card:hover{transform:scale(1.02); filter:brightness(1.1);}
+  .partner-image{background-repeat:no-repeat;}
+  @media (max-width:900px){ .partner-image{min-height:280px;} }
 
   /* ===== final ===== */
   .final{padding-bottom:160px;}
@@ -445,33 +448,8 @@
       </div>
 
       <div class="partners-grid reveal-stagger">
-        <!-- SportyBet Instant Virtuals -->
-        <div class="partner-card" style="background:linear-gradient(135deg, #E51D2A 0%, #8B0000 100%); position:relative; overflow:hidden;">
-          <div style="position:absolute; right:-20px; top:-20px; width:200px; height:200px; background:rgba(255,255,255,.05); border-radius:50%;"></div>
-          <div style="position:relative; z-index:2; padding:40px;">
-            <p style="font-family:var(--font-mono); font-size:12px; color:rgba(255,255,255,.7); text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px;">INSTANT VIRTUALS</p>
-            <h3 style="font-family:var(--font-mono); font-size:28px; font-weight:700; color:#FFFFFF; margin-bottom:8px;">SportyBet</h3>
-            <p style="font-size:15px; color:rgba(255,255,255,.85); margin-bottom:24px; max-width:320px;">Come and enjoy instant virtuals with real-time action and live odds.</p>
-            <a class="btn-primary" href="#" style="background:#FFFFFF; color:#E51D2A; border-color:#FFFFFF; display:inline-block;">Play now</a>
-          </div>
-        </div>
-
-        <!-- Red & Black Casino -->
-        <div class="partner-card" style="background:linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); border:1px solid var(--border); position:relative; overflow:hidden;">
-          <div style="position:absolute; right:-20px; top:-20px; width:200px; height:200px; background:linear-gradient(45deg, var(--red), #FFD700); opacity:.08; border-radius:50%;"></div>
-          <div style="position:relative; z-index:2; padding:40px;">
-            <p style="font-family:var(--font-mono); font-size:12px; color:var(--tx-muted); text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px;">NEWLY INTRODUCED</p>
-            <h3 style="font-family:var(--font-mono); font-size:26px; font-weight:700; color:var(--tx); margin-bottom:4px;">RED & BLACK</h3>
-            <p style="font-family:var(--font-mono); font-size:12px; color:var(--red); text-transform:uppercase; letter-spacing:.05em; margin-bottom:16px; font-weight:600;">CASINO GAMES</p>
-            <p style="font-size:15px; color:var(--tx-muted); margin-bottom:20px; max-width:320px;">Sleek red & black experience. Exciting games, big wins, safe & trusted.</p>
-            <ul style="font-size:13px; color:var(--tx-muted); display:flex; flex-direction:column; gap:8px; margin-bottom:24px;">
-              <li style="display:flex; gap:8px;"><span style="color:var(--gold); flex-shrink:0;">✦</span> <span>Pure thrill. Classy play.</span></li>
-              <li style="display:flex; gap:8px;"><span style="color:var(--gold); flex-shrink:0;">✦</span> <span>Play anytime, anywhere</span></li>
-              <li style="display:flex; gap:8px;"><span style="color:var(--gold); flex-shrink:0;">✦</span> <span>Secure payments & bonuses</span></li>
-            </ul>
-            <a class="btn-primary" href="#" style="display:inline-block;">Play now</a>
-          </div>
-        </div>
+        <a href="#" class="partner-card partner-image" style="background-image:url('sportybet.jpeg'); background-size:cover; background-position:center; display:block; min-height:360px; border:1px solid var(--border);"></a>
+        <a href="#" class="partner-card partner-image" style="background-image:url('casino.jpeg'); background-size:cover; background-position:center; display:block; min-height:360px; border:1px solid var(--border);"></a>
       </div>
     </div>
   </section>
