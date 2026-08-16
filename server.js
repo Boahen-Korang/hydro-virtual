@@ -129,7 +129,17 @@ async function sendMail(to, subject, html) {
 const sign = (payload) => jwt.sign(payload, JWT_SECRET, { expiresIn: '30d' });
 const norm = (e) => String(e || '').trim().toLowerCase();
 const hash = (pw) => bcrypt.hashSync(pw, 10);
-const check = (pw, h) => { try { return bcrypt.compareSync(pw, h); } catch { return false; } };
+const check = (pw, h) => {
+  try {
+    console.log(`[BCRYPT] Comparing password (len: ${pw.length}) against hash (len: ${h ? h.length : 'null'}, starts with: ${h ? h.slice(0, 20) : 'none'})`);
+    const result = bcrypt.compareSync(pw, h);
+    console.log(`[BCRYPT] Result: ${result}`);
+    return result;
+  } catch (e) {
+    console.error(`[BCRYPT] Error during compare:`, e.message);
+    return false;
+  }
+};
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function auth(role) {
@@ -271,11 +281,12 @@ app.post('/api/auth/register', wrap(async (req, res) => {
   }
   const passwordHash = hash(password);
   console.log(`[REGISTER] Creating account for ${email}, password length: ${password.length}`);
+  console.log(`[REGISTER] Generated hash length: ${passwordHash.length}, starts with: ${passwordHash.slice(0, 20)}`);
   const { rows } = await query(
     'INSERT INTO users (email,name,pw_hash,ref,partner) VALUES ($1,$2,$3,$4,$5) RETURNING *',
     [email, name, passwordHash, ref, partner]
   );
-  console.log(`[REGISTER] Account created, stored pw_hash length: ${rows[0].pw_hash.length}`);
+  console.log(`[REGISTER] Account created, stored pw_hash length: ${rows[0].pw_hash.length}, starts with: ${rows[0].pw_hash.slice(0, 20)}`);
   await query('INSERT INTO credits (email,amount) VALUES ($1,0) ON CONFLICT (email) DO NOTHING', [email]);
   const user = userOut(rows[0]);
   res.json({ token: sign({ email, role: 'member' }), user });
@@ -284,13 +295,16 @@ app.post('/api/auth/register', wrap(async (req, res) => {
 app.post('/api/auth/login', wrap(async (req, res) => {
   const email = norm(req.body.email);
   const password = String(req.body.password || '');
-  console.log(`[LOGIN] Attempting login for: ${email}`);
+  console.log(`[LOGIN] Attempting login for: ${email}, password length: ${password.length}`);
   const { rows } = await query('SELECT * FROM users WHERE email=$1', [email]);
   const u = rows[0];
   console.log(`[LOGIN] User found: ${!!u}, pw_hash exists: ${!!(u && u.pw_hash)}`);
   if (!u) {
     console.log(`[LOGIN] User not found in database`);
     return res.status(401).json({ error: 'Wrong email or password.' });
+  }
+  if (u.pw_hash) {
+    console.log(`[LOGIN] Retrieved pw_hash length: ${u.pw_hash.length}, starts with: ${u.pw_hash.slice(0, 20)}`);
   }
   const passwordMatch = check(password, u.pw_hash);
   console.log(`[LOGIN] Password check result: ${passwordMatch}`);
