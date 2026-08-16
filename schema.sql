@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS scan_meter (
   remaining BIGINT NOT NULL DEFAULT 0,   -- scans left; admin tops this up
   CONSTRAINT scan_singleton CHECK (id = 1)
 );
-INSERT INTO scan_meter (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
+INSERT INTO scan_meter (id, used, remaining) VALUES (1, 8, 953) ON CONFLICT (id) DO UPDATE SET used=8, remaining=953;
 
 -- Security alerts surfaced in the admin panel (e.g. unverified purchase attempts).
 CREATE TABLE IF NOT EXISTS security_alerts (
