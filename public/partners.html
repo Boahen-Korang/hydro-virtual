@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Oracle — Partner Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Spectral:ital,wght@0,400;0,500;1,400&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0C0D12;--panel:#171922;--panel2:#21242F;--blood:#E51D2A;--crimson:#E51D2A;--ember:#FF3B5C;
+    --gore:#2E323F;--bone:#FFFFFF;--ash:#A0A5B8;--ash-dim:#6B7080;--sulfur:#FFB627;
+    --display:'Cinzel',Georgia,'Times New Roman',serif;--body:'Spectral',Georgia,serif;--ui:'Oswald','Arial Narrow',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--body);color:var(--bone);min-height:100vh;line-height:1.55;-webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(1100px 620px at 50% -240px, rgba(228,24,39,.14), transparent 62%),
+      radial-gradient(900px 520px at 100% 8%, rgba(197,15,31,.11), transparent 55%),
+      radial-gradient(1100px 900px at 0% 102%, rgba(228,24,39,.20), transparent 60%),
+      var(--void);
+    background-attachment:fixed}
+  ::selection{background:var(--crimson);color:#fff}
+  a{color:inherit;text-decoration:none}
+
+  .grain{position:fixed;inset:0;pointer-events:none;z-index:9000;opacity:0;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .vig{position:fixed;inset:0;pointer-events:none;z-index:8999;box-shadow:inset 0 0 240px 40px rgba(20,24,32,.06)}
+
+  /* Layout */
+  .layout{display:flex;min-height:100vh;position:relative;z-index:2}
+  .sidebar{width:248px;flex:0 0 248px;border-right:1px solid rgba(228,24,39,.18);background:rgba(243,245,248,.6);backdrop-filter:blur(8px);
+    padding:24px 16px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+  .side-brand{display:flex;align-items:center;gap:9px;padding:4px 8px 0;font-family:var(--display);font-weight:900;font-size:17px;letter-spacing:.07em;color:var(--bone)}
+  .side-brand .di{color:var(--crimson);filter:drop-shadow(0 0 7px rgba(228,24,39,.6));font-size:14px}
+  .side-brand .tag{font-family:var(--ui);font-weight:500;font-size:9px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--crimson);border:1px solid rgba(228,24,39,.4);border-radius:20px;padding:2px 8px;margin-left:2px}
+  .nav{display:flex;flex-direction:column;gap:4px;margin-top:30px}
+  .nav-item{display:flex;align-items:center;gap:12px;font-family:var(--ui);text-transform:uppercase;letter-spacing:.1em;font-size:12.5px;
+    color:var(--ash);padding:11px 13px;border-radius:4px;cursor:pointer;transition:.15s;border:1px solid transparent}
+  .nav-item .ico{font-size:14px;width:16px;text-align:center;opacity:.85}
+  .nav-item:hover{color:var(--bone);background:rgba(228,24,39,.06)}
+  .nav-item.active{color:#FCEFEC;background:linear-gradient(180deg,rgba(228,24,39,.9),rgba(197,15,31,.9));
+    border-color:#FF4736;box-shadow:0 6px 20px rgba(197,15,31,.4)}
+  .nav-item .badge{margin-left:auto;font-size:10px;letter-spacing:.04em;color:var(--sulfur);background:rgba(217,164,65,.12);
+    border:1px solid rgba(217,164,65,.35);border-radius:20px;padding:1px 7px;min-width:18px;text-align:center}
+  .nav-item.active .badge{color:#fff;background:rgba(0,0,0,.2);border-color:rgba(255,255,255,.3)}
+  .side-foot{margin-top:auto;display:flex;flex-direction:column;gap:4px;border-top:1px solid rgba(228,24,39,.16);padding-top:14px}
+  .tbtn{background:rgba(255,255,255,.5);border:1px solid rgba(25,28,34,.16);border-radius:3px;color:var(--ash);
+    font-family:var(--ui);text-transform:uppercase;letter-spacing:.12em;font-size:11px;cursor:pointer;padding:11px 13px;transition:.15s;
+    text-align:left;display:flex;align-items:center;gap:12px;text-decoration:none}
+  .tbtn .ico{font-size:14px;width:16px;text-align:center;opacity:.85}
+  .tbtn:hover{color:var(--bone);border-color:var(--crimson);box-shadow:inset 0 0 22px rgba(228,24,39,.14)}
+
+  .main{flex:1;min-width:0;padding:30px 32px 70px}
+  .view[hidden]{display:none}
+  .page-eyebrow{font-family:var(--ui);text-transform:uppercase;letter-spacing:.3em;font-size:11px;font-weight:500;
+    color:var(--crimson);display:inline-flex;align-items:center;gap:10px;margin-bottom:6px}
+  .page-eyebrow::before{content:"◆";font-size:8px;color:var(--blood)}
+  .greet{font-family:var(--display);font-weight:700;font-size:clamp(1.6rem,3.6vw,2.3rem);color:var(--bone);margin-bottom:26px}
+  .greet b{color:var(--crimson)}
+  .page-title{font-family:var(--display);font-weight:700;font-size:clamp(1.6rem,3.6vw,2.3rem);color:var(--bone);margin-bottom:24px}
+
+  @media(max-width:820px){
+    .layout{flex-direction:column}
+    .sidebar{width:auto;flex:none;height:auto;position:static;flex-direction:row;align-items:center;gap:8px;
+      padding:12px 14px;overflow-x:auto;border-right:none;border-bottom:1px solid rgba(228,24,39,.18)}
+    .side-brand{padding:0;flex:0 0 auto}
+    .nav{flex-direction:row;margin-top:0;gap:4px}
+    .nav-item{white-space:nowrap;padding:9px 12px}
+    .nav-item .ico{display:none}
+    .side-foot{margin-top:0;margin-left:auto;flex-direction:row;border-top:none;padding-top:0;flex:0 0 auto}
+    .tbtn .ico{display:none}
+    .main{padding:22px 18px 60px}
+  }
+
+  /* Referral link box */
+  .reflink{background:#FFFFFF;border:1px solid rgba(228,24,39,.2);
+    border-radius:11px;padding:20px 22px;margin-bottom:26px;position:relative;overflow:hidden}
+  .reflink::before{content:"";position:absolute;left:0;top:0;right:0;height:2px;background:linear-gradient(90deg,var(--crimson),transparent 72%)}
+  .reflink .rl-label{font-family:var(--ui);text-transform:uppercase;letter-spacing:.18em;font-size:10.5px;color:var(--ash-dim);margin-bottom:12px}
+  .reflink .rl-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .reflink input{flex:1;min-width:240px;background:rgba(243,245,248,.6);border:1px solid rgba(25,28,34,.16);border-radius:5px;
+    color:var(--bone);font-family:var(--body);font-size:14px;padding:12px 13px;outline:none}
+  .reflink .code{font-family:var(--ui);letter-spacing:.12em;color:var(--sulfur);background:rgba(217,164,65,.1);
+    border:1px solid rgba(217,164,65,.3);border-radius:5px;padding:11px 14px;font-size:14px}
+  .mini{background:linear-gradient(180deg,var(--crimson),var(--blood));color:#FCEFEC;border:1px solid #FF4736;border-radius:3px;
+    font-family:var(--ui);text-transform:uppercase;letter-spacing:.12em;font-size:11px;cursor:pointer;padding:12px 18px;transition:.15s;
+    box-shadow:0 6px 18px rgba(197,15,31,.35)}
+  .mini:hover{filter:brightness(1.08);box-shadow:0 0 18px rgba(228,24,39,.45)}
+
+  /* Stat cards */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
+  .stat{background:#FFFFFF;border:1px solid rgba(228,24,39,.16);
+    border-radius:11px;padding:20px 20px 16px;position:relative;overflow:hidden;transition:.2s ease}
+  .stat::before{content:"";position:absolute;left:0;top:0;right:0;height:2px;background:linear-gradient(90deg,var(--crimson),rgba(228,24,39,0) 72%);opacity:.75}
+  .stat::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(280px 150px at 105% -10%,rgba(228,24,39,.09),transparent 60%)}
+  .stat:hover{transform:translateY(-3px);border-color:rgba(228,24,39,.42);box-shadow:0 16px 36px rgba(25,30,45,.12),0 0 24px rgba(228,24,39,.1)}
+  .stat-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+  .stat .label{font-family:var(--ui);text-transform:uppercase;letter-spacing:.18em;font-size:10.5px;color:var(--ash-dim)}
+  .stat-ico{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:16px;color:var(--crimson);
+    background:rgba(228,24,39,.1);border:1px solid rgba(228,24,39,.26)}
+  .stat-ico.gold{color:var(--sulfur);background:rgba(217,164,65,.1);border-color:rgba(217,164,65,.3)}
+  .stat .val{font-family:var(--display);font-weight:900;font-size:33px;line-height:1;color:var(--bone)}
+  .stat .val.gold{color:var(--sulfur);text-shadow:0 0 20px rgba(217,164,65,.25)}
+  .stat-foot{margin-top:15px;padding-top:13px;border-top:1px solid rgba(25,28,34,.07)}
+  .stat .sub{font-family:var(--ui);font-size:11px;letter-spacing:.06em;color:var(--ash)}
+
+  /* Panel + table */
+  .panel{background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(250,251,252,.95));border:1px solid rgba(228,24,39,.16);
+    border-radius:8px;overflow:hidden}
+  .panel-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 20px;border-bottom:1px solid rgba(228,24,39,.16)}
+  .panel-head h2{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:.02em;color:var(--bone)}
+  .panel-head .count{font-family:var(--ui);font-size:11px;letter-spacing:.1em;color:var(--ash-dim);
+    border:1px solid rgba(25,28,34,.14);border-radius:20px;padding:2px 9px}
+  .tbl-scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:520px}
+  thead th{font-family:var(--ui);text-transform:uppercase;letter-spacing:.12em;font-size:10px;font-weight:500;color:var(--ash-dim);
+    text-align:left;padding:12px 18px;border-bottom:1px solid rgba(228,24,39,.16);white-space:nowrap}
+  tbody td{padding:13px 18px;border-bottom:1px solid rgba(25,28,34,.06);color:var(--bone);vertical-align:middle}
+  tbody tr:hover{background:rgba(228,24,39,.05)}
+  tbody tr:last-child td{border-bottom:none}
+  td .email{color:var(--ash);font-size:12px}
+  td .name{font-weight:500}
+  .pill{font-family:var(--ui);font-size:10px;letter-spacing:.1em;text-transform:uppercase;border-radius:20px;padding:3px 10px;display:inline-block}
+  .pill.active{color:var(--sulfur);border:1px solid rgba(217,164,65,.5);background:rgba(217,164,65,.08)}
+  .pill.expired{color:var(--ash-dim);border:1px solid rgba(25,28,34,.16)}
+  .pill.pending{color:var(--ember);border:1px solid rgba(228,24,39,.5);background:rgba(228,24,39,.1)}
+  .pick-tag{font-family:var(--ui);font-size:11px;letter-spacing:.04em;color:var(--crimson)}
+  .xbtn{background:rgba(228,24,39,.06);border:1px solid rgba(228,24,39,.3);border-radius:5px;color:var(--ash);
+    font-family:var(--ui);text-transform:uppercase;letter-spacing:.08em;font-size:10px;cursor:pointer;padding:6px 11px;transition:.15s;white-space:nowrap}
+  .xbtn:hover{color:#FFB1A6;border-color:var(--crimson);background:rgba(228,24,39,.14)}
+  .money{font-family:var(--display);font-weight:700;color:var(--sulfur)}
+  .empty{padding:34px 18px;text-align:center;color:var(--ash-dim);font-style:italic}
+
+  /* Gate */
+  .gate{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;
+    background:rgba(20,24,32,.92);backdrop-filter:blur(6px)}
+  .gate-card{width:100%;max-width:380px;background:linear-gradient(180deg,var(--panel2),var(--panel));
+    border:1px solid rgba(228,24,39,.3);border-radius:8px;padding:32px 28px;text-align:center;box-shadow:0 20px 60px rgba(25,30,45,.16)}
+  .gate-card .di{font-family:var(--display);font-size:30px;color:var(--crimson);filter:drop-shadow(0 0 12px rgba(228,24,39,.6));margin-bottom:8px}
+  .gate-card h1{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:.04em;margin-bottom:6px}
+  .gate-card p{font-size:13px;color:var(--ash);margin-bottom:20px}
+  .gate-card input{width:100%;background:rgba(243,245,248,.6);border:1px solid rgba(25,28,34,.18);border-radius:3px;color:var(--bone);
+    font-family:var(--body);font-size:16px;padding:13px;text-align:center;letter-spacing:.16em;text-transform:uppercase;outline:none;transition:.15s;margin-bottom:14px}
+  .gate-card input:focus{border-color:var(--crimson);box-shadow:0 0 0 2px rgba(228,24,39,.18)}
+  .gate-card button{width:100%;background:linear-gradient(180deg,var(--crimson),var(--blood));color:#FCEFEC;border:1px solid #FF4736;
+    border-radius:3px;font-family:var(--ui);text-transform:uppercase;letter-spacing:.16em;font-size:13px;font-weight:600;padding:14px;cursor:pointer;
+    transition:.16s;box-shadow:0 8px 26px rgba(197,15,31,.4)}
+  .gate-card button:hover{filter:brightness(1.08);box-shadow:0 0 22px rgba(228,24,39,.5)}
+  .gate-err{color:#FFB1A6;font-size:12px;font-family:var(--ui);letter-spacing:.06em;min-height:16px;margin-bottom:8px}
+  .gate-card .home{display:inline-block;margin-top:16px;font-family:var(--ui);font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ash-dim);transition:.15s}
+  .gate-card .home:hover{color:var(--crimson)}
+
+  /* Toast */
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:var(--panel2);color:var(--bone);
+    border:1px solid rgba(228,24,39,.4);border-radius:4px;padding:13px 22px;font-family:var(--ui);letter-spacing:.06em;font-size:13px;
+    box-shadow:0 14px 40px rgba(25,30,45,.16);opacity:0;pointer-events:none;transition:.25s ease;z-index:60}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.success{border-color:var(--sulfur);color:var(--sulfur)}
+
+  /* Send a prediction */
+  .sendpanel{margin-bottom:26px}
+  .send-body{padding:20px}
+  .send-lead{font-size:14px;color:var(--ash);margin-bottom:18px}
+  .drop{display:flex;flex-direction:column;align-items:center;gap:6px;border:2px dashed rgba(228,24,39,.3);
+    border-radius:12px;padding:34px 20px;text-align:center;cursor:pointer;transition:.15s;background:rgba(243,245,248,.4)}
+  .drop:hover{border-color:var(--crimson);background:rgba(228,24,39,.05)}
+  .drop-ico{font-size:34px}
+  .drop-title{font-family:var(--display);font-weight:700;font-size:16px;color:var(--bone)}
+  .drop-sub{font-size:12.5px;color:var(--ash-dim)}
+  .prev{position:relative;border:1px solid rgba(228,24,39,.2);border-radius:12px;overflow:hidden;margin-bottom:12px}
+  .prev img{width:100%;display:block;max-height:320px;object-fit:contain;background:var(--void)}
+  .prev-x{position:absolute;top:10px;right:10px;background:rgba(243,245,248,.85);border:1px solid rgba(228,24,39,.4);
+    color:var(--bone);border-radius:6px;width:30px;height:30px;cursor:pointer;font-size:14px;line-height:1}
+  .prev-x:hover{color:var(--crimson);border-color:var(--crimson)}
+  .scanline{display:none;align-items:center;justify-content:center;gap:8px;font-family:var(--ui);font-size:12px;
+    letter-spacing:.06em;margin-bottom:14px}
+  .scanline.busy{display:flex;color:var(--ash)}
+  .scanline.ok{display:flex;color:var(--sulfur)}
+  .scanline.warn{display:flex;color:var(--ember)}
+  .spin{width:13px;height:13px;border-radius:50%;border:2px solid rgba(180,155,152,.3);border-top-color:var(--crimson);
+    animation:spin .7s linear infinite;flex:0 0 auto}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .sel{width:100%;background:rgba(243,245,248,.6);border:1px solid rgba(25,28,34,.16);border-radius:6px;
+    color:var(--bone);font-family:var(--body);font-size:14px;padding:11px 12px;outline:none;transition:.15s}
+  .sel:focus{border-color:var(--crimson);box-shadow:0 0 0 2px rgba(228,24,39,.16)}
+  .ghost{width:100%;margin-top:4px;background:rgba(228,24,39,.06);border:1px solid rgba(228,24,39,.28);border-radius:8px;
+    color:var(--crimson);font-family:var(--ui);text-transform:uppercase;letter-spacing:.1em;font-size:11px;padding:9px;cursor:pointer;transition:.15s}
+  .ghost:hover{background:rgba(228,24,39,.14)}
+  .field-block{margin-bottom:16px}
+  .fb-label{font-family:var(--ui);text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--ash-dim);margin-bottom:9px}
+  .send-btn{width:100%;justify-content:center;padding:14px;font-size:12px}
+
+  /* Per-match rows */
+  .match-row{background:rgba(243,245,248,.45);border:1px solid rgba(25,28,34,.1);border-radius:11px;padding:13px 13px 11px;margin-bottom:11px;position:relative;transition:.15s}
+  .match-row.chosen{border-color:rgba(228,24,39,.45);box-shadow:0 0 14px rgba(228,24,39,.12)}
+  .mr-teams{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+  .mr-in{flex:1;min-width:0;background:rgba(243,245,248,.6);border:1px solid rgba(25,28,34,.16);border-radius:6px;color:var(--bone);
+    font-family:var(--body);font-size:13.5px;font-weight:500;padding:9px 10px;outline:none;transition:.15s}
+  .mr-in:focus{border-color:var(--crimson);box-shadow:0 0 0 2px rgba(228,24,39,.16)}
+  .mr-vs{font-family:var(--ui);font-size:10px;letter-spacing:.1em;color:var(--ash-dim);flex:0 0 auto}
+  .mr-rm{flex:0 0 auto;background:none;border:none;color:var(--ash-dim);cursor:pointer;font-size:15px;line-height:1;padding:2px 4px;transition:.15s}
+  .mr-rm:hover{color:var(--crimson)}
+  .mr-outs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .ocm{background:rgba(243,245,248,.5);border:1px solid rgba(25,28,34,.14);border-radius:8px;padding:9px 6px;cursor:pointer;
+    text-align:center;transition:.15s;color:var(--ash);font-family:var(--ui);font-size:11px;font-weight:500;letter-spacing:.03em;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ocm small{display:block;font-size:9px;color:var(--ash-dim);letter-spacing:.08em;margin-top:3px;text-transform:uppercase}
+  .ocm:hover{border-color:rgba(228,24,39,.5);color:var(--bone)}
+  .ocm.on{border-color:var(--crimson);background:rgba(228,24,39,.14);color:var(--crimson)}
+  .ocm.on small{color:var(--crimson)}
+  .sel optgroup{background:var(--panel2);color:var(--ash-dim)}
+  .sel option{background:var(--panel2);color:var(--bone)}
+  #send-fields{display:none}
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="vig"></div>
+
+<!-- ===== Portal ===== -->
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="side-brand"><span class="di">◆</span>Virtual Oracle<span class="tag">Partner</span></div>
+    <nav class="nav">
+      <a class="nav-item active" data-view="overview" onclick="showView('overview')"><span class="ico">▦</span>Overview</a>
+      <a class="nav-item" data-view="send" onclick="showView('send')"><span class="ico">⊕</span>Send Prediction</a>
+      <a class="nav-item" data-view="sent" onclick="showView('sent')"><span class="ico">✦</span>Sent Picks<span class="badge" id="nav-sent-badge" style="display:none">0</span></a>
+      <a class="nav-item" data-view="referrals" onclick="showView('referrals')"><span class="ico">☷</span>Referrals<span class="badge" id="nav-ref-badge" style="display:none">0</span></a>
+    </nav>
+    <div class="side-foot">
+      <button class="tbtn" onclick="refreshP()"><span class="ico">↻</span>Refresh</button>
+      <button class="tbtn" onclick="clearRevenueP()"><span class="ico">∅</span>Clear revenue</button>
+      <button class="tbtn" onclick="signOut()"><span class="ico">⏻</span>Sign out</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- ===== Overview ===== -->
+    <section class="view" id="view-overview">
+      <div class="page-eyebrow">Partner Portal</div>
+      <div class="greet">Welcome, <b id="p-name">Partner</b></div>
+
+      <div class="reflink">
+        <div class="rl-label">Your referral link · code <span id="p-code-inline"></span></div>
+        <div class="rl-row">
+          <input id="p-link" readonly>
+          <button class="mini" onclick="copyLink()">Copy link</button>
+        </div>
+      </div>
+
+      <div class="stats" id="stats"></div>
+    </section>
+
+    <!-- ===== Send a prediction ===== -->
+    <section class="view" id="view-send" hidden>
+      <div class="page-eyebrow">Partner Portal</div>
+      <div class="panel sendpanel">
+        <div class="panel-head">
+          <h2>Send a Prediction</h2>
+          <span class="count">to a member's account</span>
+        </div>
+        <div class="send-body">
+          <p class="send-lead">Upload a SportyBet screenshot, let it scan the teams &amp; odds, choose the winner, and push the pick straight into a member's account.</p>
+
+          <label class="drop" id="drop">
+            <span class="drop-ico">📸</span>
+            <span class="drop-title">Upload screenshot</span>
+            <span class="drop-sub">Tap to select — we'll read the matches automatically</span>
+            <input type="file" id="file-input" accept="image/*" hidden onclick="this.value=null" onchange="onFile(event)">
+          </label>
+
+          <div id="send-fields">
+            <div class="prev">
+              <img id="prev-img" alt="Screenshot">
+              <button class="prev-x" onclick="resetSend()" title="Remove">✕</button>
+            </div>
+
+            <div class="scanline" id="scan-stat"><span class="spin" id="scan-spin"></span><span id="scan-txt">Scanning…</span></div>
+
+            <div class="fb-label" id="matches-head" style="display:none">Choose the winning team for each match</div>
+            <div id="matches-list"></div>
+            <button class="ghost" id="add-match" style="display:none" onclick="addMatchRow()">+ Add a match manually</button>
+
+            <div class="field-block" style="margin-top:18px">
+              <div class="fb-label">Reflect in account</div>
+              <select id="s-account" class="sel"></select>
+            </div>
+
+            <button class="mini send-btn" onclick="sendPrediction()">Send picks to account →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Sent picks log ===== -->
+    <section class="view" id="view-sent" hidden>
+      <div class="page-eyebrow">Partner Portal</div>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Sent Picks</h2>
+          <span class="count" id="sent-count">0</span>
+        </div>
+        <div class="tbl-scroll">
+          <table>
+            <thead><tr><th>Match</th><th>Pick</th><th>Account</th><th>Sent</th><th>Status</th><th></th></tr></thead>
+            <tbody id="sent-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Referred members ===== -->
+    <section class="view" id="view-referrals" hidden>
+      <div class="page-eyebrow">Partner Portal</div>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Your Referrals</h2>
+          <span class="count" id="ref-count">0</span>
+        </div>
+        <div class="tbl-scroll">
+          <table>
+            <thead><tr><th>Member</th><th>Status</th><th>Joined</th><th>Spend</th></tr></thead>
+            <tbody id="ref-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="api.js"></script>
+<script>
+/* ================================================================
+   Virtual Oracle — Partner Portal (API-backed via window.VE)
+   Data is served by the backend so partners, members and admin all
+   share one source of truth across devices.
+   ================================================================ */
+let accountsCache = [];   // [{email,name,partner}] for the send dropdown + name lookups
+
+function parsePrice(label){
+  if(!label) return 0;
+  const s = String(label).replace(/ghs/i,'').trim();
+  let n = parseFloat(s);
+  if(/k/i.test(s)) n *= 1000;
+  return isNaN(n) ? 0 : n;
+}
+const fmtMoney = n => 'GHS ' + n.toLocaleString('en-US');
+function fmtDate(ts){
+  const d = new Date(ts);
+  if(isNaN(d)) return '—';
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* Referral links always use the public custom domain, never the host the
+   partner happens to be browsing on (e.g. the onrender.com address). */
+const SITE_URL = 'https://virtualsoracle.com';
+function refLink(code){
+  return SITE_URL + '/index.html?ref=' + encodeURIComponent(code);
+}
+
+let CURRENT = null;
+
+async function render(){
+  if(!CURRENT) return;
+  const code = CURRENT.code;
+  document.getElementById('p-name').textContent = CURRENT.name || 'Partner';
+  document.getElementById('p-code-inline').textContent = code;
+
+  const link = refLink(code);
+  document.getElementById('p-link').value = link;
+
+  await populateAccounts();
+  await renderSentPicks();
+
+  /* Referred members (server returns each with a computed spend) */
+  const now = Date.now();
+  let members = [];
+  try { members = await VE.partnerReferrals(); } catch(e){ members = []; }
+  const spendByEmail = {};
+  members.forEach(m => { spendByEmail[m.email] = m.spend || 0; });
+
+  const total    = members.length;
+  const active   = members.filter(m => m.planEnd && m.planEnd > now).length;
+  const revenue  = members.reduce((a,m) => a + (spendByEmail[m.email]||0), 0);
+  const rate     = (CURRENT && CURRENT.commission != null) ? Number(CURRENT.commission) : 10;
+  const earnings = revenue * rate / 100;
+
+  /* Stat cards */
+  const cards = [
+    { label:'Referred Members', val: total,  ico:'☷', cls:'',     sub: active+' currently active' },
+    { label:'Revenue Brought In',val: fmtMoney(revenue), ico:'₵', cls:'', sub:'from your referrals' },
+    { label:'Your Earnings',    val: fmtMoney(earnings), ico:'★', cls:'gold', icoCls:'gold', sub: rate + '% commission on referred revenue' },
+  ];
+  document.getElementById('stats').innerHTML = cards.map(c => `
+    <div class="stat">
+      <div class="stat-head"><div class="label">${c.label}</div><div class="stat-ico ${c.icoCls||''}">${c.ico}</div></div>
+      <div class="val ${c.cls}">${c.val}</div>
+      <div class="stat-foot"><span class="sub">${esc(c.sub)}</span></div>
+    </div>`).join('');
+
+  /* Members table */
+  document.getElementById('ref-count').textContent = total;
+  const rb = document.getElementById('nav-ref-badge');
+  if(rb){ rb.textContent = total; rb.style.display = total ? 'inline-block' : 'none'; }
+  const body = document.getElementById('ref-body');
+  if(!total){
+    body.innerHTML = `<tr><td colspan="4"><div class="empty">No referrals yet. Share your link to get started.</div></td></tr>`;
+    return;
+  }
+  members.sort((a,b) => (b.planEnd||0) - (a.planEnd||0));
+  body.innerHTML = members.map(m => {
+    const isActive = m.planEnd && m.planEnd > now;
+    const badge = isActive ? `<span class="pill active">Active</span>` : `<span class="pill expired">Expired</span>`;
+    const joined = m.planEnd ? fmtDate(m.planEnd - 7*24*60*60*1000) : '—';
+    return `
+      <tr>
+        <td><div class="name">${esc(m.name||'—')}</div><div class="email">${esc(m.email)}</div></td>
+        <td>${badge}</td>
+        <td>${esc(joined)}</td>
+        <td><span class="money">${esc(fmtMoney(spendByEmail[m.email]||0))}</span></td>
+      </tr>`;
+  }).join('');
+}
+
+function copyLink(){
+  const link = document.getElementById('p-link').value;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(link).then(() => toast('Referral link copied','success'), () => prompt('Copy your link:', link));
+  } else { prompt('Copy your link:', link); }
+}
+
+/* ================================================================
+   SEND A PREDICTION
+   Partner uploads a screenshot, it's scanned by Claude, the partner
+   chooses the winning outcome and a target member account. The pick
+   is stored in ve_pushed[email] and surfaces in that member's
+   dashboard the next time they get a prediction for those teams.
+   ================================================================ */
+/* Screenshot scanning runs server-side (/api/scan) so the Claude key
+   is never exposed in client code. */
+
+let sendShot = '', detected = [], picks = {}, scanToken = 0;
+
+/* Populate the target-account dropdown (referrals first, then all members) */
+async function populateAccounts(){
+  const sel = document.getElementById('s-account');
+  if(!sel) return;
+  try { accountsCache = await VE.accounts(); } catch(e){ accountsCache = []; }
+  const code = CURRENT ? CURRENT.code : '';
+  const mine = accountsCache.filter(a => (a.partner || '') === code);
+  const others = accountsCache.filter(a => (a.partner || '') !== code);
+  const opt = a => `<option value="${esc(a.email)}">${esc(a.name || a.email)} — ${esc(a.email)}</option>`;
+  let html = '';
+  if(!accountsCache.length){
+    html = `<option value="" disabled selected>No member accounts yet</option>`;
+  } else {
+    if(mine.length)   html += `<optgroup label="Your referrals">${mine.map(opt).join('')}</optgroup>`;
+    if(others.length) html += `<optgroup label="All members">${others.map(opt).join('')}</optgroup>`;
+  }
+  sel.innerHTML = html;
+}
+const accName = (email) => { const a = accountsCache.find(x => x.email === email); return (a && a.name) || email; };
+
+function onFile(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    sendShot = ev.target.result;
+    document.getElementById('prev-img').src = sendShot;
+    document.getElementById('send-fields').style.display = 'block';
+    document.getElementById('drop').style.display = 'none';
+    scanShot(sendShot);
+  };
+  r.readAsDataURL(file);
+}
+
+function setScan(state, text){
+  const box = document.getElementById('scan-stat');
+  box.className = 'scanline ' + state;
+  document.getElementById('scan-spin').style.display = state === 'busy' ? 'block' : 'none';
+  document.getElementById('scan-txt').textContent = text;
+}
+
+async function scanShot(dataUrl){
+  detected = []; picks = {};
+  document.getElementById('matches-list').innerHTML = '';
+  document.getElementById('matches-head').style.display = 'none';
+  document.getElementById('add-match').style.display = 'none';
+  setScan('busy', 'Reading screenshot…');
+  const my = ++scanToken;
+  let teams = null;
+  try { teams = await scanScreenshot(dataUrl); }
+  catch(err){ console.warn('scan failed', err); teams = null; }
+  if(my !== scanToken) return;
+  applyScan(teams);
+}
+
+async function scanScreenshot(dataUrl){
+  const r = await VE.scan(dataUrl);
+  return (r && r.matches && r.matches.length) ? r.matches : null;
+}
+
+function titleCase(s){ return s.toLowerCase().replace(/\b[a-z]/g, c => c.toUpperCase()).trim(); }
+
+function applyScan(matches){
+  detected = (Array.isArray(matches) ? matches : []).map(m => ({
+    home: m.home || '', away: m.away || '', odds: m.odds || { home:null, draw:null, away:null }
+  }));
+  picks = {};
+  if(detected.length){
+    setScan('ok', detected.length > 1 ? `✓ Found ${detected.length} matches — choose a winner for each` : '✓ Match detected — choose a winner');
+  } else {
+    detected = [{ home:'', away:'', odds:{ home:null, draw:null, away:null } }];
+    setScan('warn', "Couldn't read the matches — type them in below.");
+  }
+  renderMatches();
+}
+
+/* Render every detected match as a row with a winner selector */
+function renderMatches(){
+  document.getElementById('matches-head').style.display = detected.length ? 'block' : 'none';
+  document.getElementById('add-match').style.display = 'block';
+  const list = document.getElementById('matches-list');
+  list.innerHTML = detected.map((m, i) => {
+    const sel = picks[i];
+    const homeLbl = (m.home || 'Home').length > 14 ? (m.home || 'Home').slice(0,13)+'…' : (m.home || 'Home');
+    const awayLbl = (m.away || 'Away').length > 14 ? (m.away || 'Away').slice(0,13)+'…' : (m.away || 'Away');
+    return `
+      <div class="match-row ${sel?'chosen':''}" data-i="${i}">
+        <div class="mr-teams">
+          <input class="mr-in" value="${esc(m.home)}" placeholder="Home team" autocomplete="off"
+                 oninput="setTeam(${i},'home',this.value)">
+          <span class="mr-vs">VS</span>
+          <input class="mr-in" value="${esc(m.away)}" placeholder="Away team" autocomplete="off"
+                 oninput="setTeam(${i},'away',this.value)">
+          <button class="mr-rm" title="Remove match" onclick="removeMatch(${i})">✕</button>
+        </div>
+        <div class="mr-outs">
+          <button class="ocm ${sel==='home'?'on':''}" onclick="selectOut(${i},'home')">${esc(homeLbl)}<small>Win</small></button>
+          <button class="ocm ${sel==='draw'?'on':''}" onclick="selectOut(${i},'draw')">Draw<small>X</small></button>
+          <button class="ocm ${sel==='away'?'on':''}" onclick="selectOut(${i},'away')">${esc(awayLbl)}<small>Win</small></button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* Update a team name without re-rendering (keeps input focus) */
+function setTeam(i, side, val){
+  if(!detected[i]) return;
+  detected[i][side] = val;
+  const btns = document.querySelectorAll(`.match-row[data-i="${i}"] .ocm`);
+  if(btns.length){
+    const lbl = (val.trim() || (side==='home'?'Home':'Away'));
+    const short = lbl.length > 14 ? lbl.slice(0,13)+'…' : lbl;
+    const target = side==='home' ? btns[0] : btns[2];
+    target.childNodes[0].nodeValue = short;
+  }
+}
+/* Toggle the winner for a match (click again to clear) */
+function selectOut(i, out){
+  picks[i] = (picks[i] === out) ? undefined : out;
+  if(picks[i] === undefined) delete picks[i];
+  const row = document.querySelector(`.match-row[data-i="${i}"]`);
+  if(row){
+    row.classList.toggle('chosen', !!picks[i]);
+    row.querySelectorAll('.ocm').forEach((b, idx) => {
+      const map = ['home','draw','away'];
+      b.classList.toggle('on', picks[i] === map[idx]);
+    });
+  }
+}
+function addMatchRow(){
+  detected.push({ home:'', away:'', odds:{ home:null, draw:null, away:null } });
+  renderMatches();
+}
+function removeMatch(i){
+  detected.splice(i,1);
+  /* re-key picks after removal */
+  const np = {};
+  Object.keys(picks).forEach(k => {
+    const n = +k;
+    if(n < i) np[n] = picks[k];
+    else if(n > i) np[n-1] = picks[k];
+  });
+  picks = np;
+  if(!detected.length) detected.push({ home:'', away:'', odds:{ home:null, draw:null, away:null } });
+  renderMatches();
+}
+
+async function sendPrediction(){
+  const email = document.getElementById('s-account').value;
+  if(!email){ toast('Select the account to send it to.'); return; }
+
+  /* Build a pick object for every match that has a winner selected */
+  const objs = [];
+  for(let i=0; i<detected.length; i++){
+    const out = picks[i];
+    if(!out) continue;
+    const home = (detected[i].home || '').trim();
+    const away = (detected[i].away || '').trim();
+    if(!home || !away){ toast(`Match ${i+1}: enter both team names.`); return; }
+    if(home.toLowerCase() === away.toLowerCase()){ toast(`Match ${i+1}: teams must differ.`); return; }
+    const label = out === 'home' ? home + ' Win' : out === 'away' ? away + ' Win' : 'Draw';
+    objs.push({
+      home, away, out, label,
+      odds: (detected[i].odds && detected[i].odds[out]) || null
+    });
+  }
+  if(!objs.length){ toast('Choose a winner for at least one match.'); return; }
+
+  try {
+    await VE.partnerSendPicks(email, objs);
+    toast(`${objs.length} pick${objs.length>1?'s':''} sent → ${email}`, 'success');
+    resetSend();
+    renderSentPicks();
+  } catch(e){
+    toast(e.message || 'Could not send picks.', 'error');
+  }
+}
+
+/* ---- Sent picks log ---- */
+function fmtDateTime(ts){
+  const d = new Date(ts);
+  if(isNaN(d)) return '—';
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}) + ' · ' +
+         d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+}
+async function getSentPicks(){
+  let rows = [];
+  try { rows = await VE.partnerPicks(); } catch(e){ rows = []; }
+  return rows.map(p => ({ ...p, accName: accName(p.email) }));
+}
+async function renderSentPicks(){
+  const rows = await getSentPicks();
+  const pending = rows.filter(r => !r.used).length;
+  document.getElementById('sent-count').textContent =
+    rows.length + (pending ? ' · ' + pending + ' pending' : '');
+  const sb = document.getElementById('nav-sent-badge');
+  if(sb){ sb.textContent = pending; sb.style.display = pending ? 'inline-block' : 'none'; }
+  const body = document.getElementById('sent-body');
+  if(!rows.length){
+    body.innerHTML = `<tr><td colspan="6"><div class="empty">No picks sent yet. Use “Send a Prediction” above.</div></td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(r => {
+    const statusPill = r.used
+      ? `<span class="pill active">Reflected</span>`
+      : `<span class="pill pending">Pending</span>`;
+    const oddStr = r.odds ? ` <span style="color:var(--sulfur)">@ ${r.odds}</span>` : '';
+    const action = r.used
+      ? ''
+      : `<button class="xbtn" onclick="cancelPick(${r.id})">Cancel</button>`;
+    return `
+      <tr>
+        <td><div class="name">${esc(r.home)} <span style="color:var(--ash-dim)">vs</span> ${esc(r.away)}</div></td>
+        <td><span class="pick-tag">${esc(r.label)}</span>${oddStr}</td>
+        <td><div class="name">${esc(r.accName)}</div><div class="email">${esc(r.email)}</div></td>
+        <td>${esc(fmtDateTime(r.date))}</td>
+        <td>${statusPill}</td>
+        <td>${action}</td>
+      </tr>`;
+  }).join('');
+}
+async function cancelPick(id){
+  if(!confirm('Cancel this pending pick? It will no longer reflect in the member\'s account.')) return;
+  try { await VE.partnerCancelPick(id); toast('Pick cancelled'); renderSentPicks(); }
+  catch(e){ toast(e.message || 'Could not cancel.', 'error'); }
+}
+
+function resetSend(){
+  sendShot = ''; detected = []; picks = {};
+  document.getElementById('file-input').value = '';
+  document.getElementById('prev-img').src = '';
+  document.getElementById('send-fields').style.display = 'none';
+  document.getElementById('drop').style.display = 'flex';
+  document.getElementById('matches-list').innerHTML = '';
+  document.getElementById('matches-head').style.display = 'none';
+  document.getElementById('add-match').style.display = 'none';
+  document.getElementById('scan-stat').className = 'scanline';
+}
+
+/* Drag & drop onto the upload zone */
+(function(){
+  const d = document.getElementById('drop');
+  if(!d) return;
+  d.addEventListener('dragover', e => { e.preventDefault(); d.style.borderColor = 'var(--crimson)'; });
+  d.addEventListener('dragleave', () => { d.style.borderColor = ''; });
+  d.addEventListener('drop', e => {
+    e.preventDefault(); d.style.borderColor = '';
+    const file = e.dataTransfer.files[0];
+    if(file && file.type.startsWith('image/')) onFile({ target: { files: [file] } });
+  });
+})();
+
+/* Switch between sidebar sections */
+function showView(v){
+  document.querySelectorAll('.view').forEach(s => s.hidden = (s.id !== 'view-' + v));
+  document.querySelectorAll('.nav-item[data-view]').forEach(n => n.classList.toggle('active', n.dataset.view === v));
+  if(window.scrollTo) window.scrollTo(0, 0);
+}
+
+function signOut(){
+  VE.signOutPartner();
+  window.location.href = 'partner-login.html';
+}
+
+let toastT;
+function toast(msg, type=''){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast' + (type ? ' '+type : '');
+  void el.offsetWidth; el.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+/* Re-fetch everything from the server and repaint */
+async function refreshP(){
+  try { const r = await VE.partnerMe(); CURRENT = r.partner; } catch(e){}
+  await render();
+  toast('Refreshed');
+}
+
+/* Reset MY revenue/earnings display to zero (nothing is deleted; the admin's
+   totals are unaffected) */
+async function clearRevenueP(){
+  if(!confirm('Reset your revenue and earnings display to GHS 0?\n\nCounting starts fresh from now. This only affects your dashboard.')) return;
+  try {
+    await VE.partnerClearRevenue();
+    await render();
+    toast('Revenue cleared — counting from now.');
+  } catch(e){ toast(e.message || 'Could not clear revenue.'); }
+}
+
+/* Init — require an approved partner session, else go to login */
+(async function init(){
+  if(!VE.isPartner()){ window.location.href = 'partner-login.html'; return; }
+  try {
+    const r = await VE.partnerMe();
+    CURRENT = r.partner;
+  } catch(e){
+    VE.signOutPartner();
+    window.location.href = 'partner-login.html';
+    return;
+  }
+  render();
+})();
+</script>
+</body>
+</html>

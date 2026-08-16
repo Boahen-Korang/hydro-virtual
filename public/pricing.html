@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Oracle — Choose Package</title>
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Spectral:ital,wght@0,400;0,500;1,400&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0C0D12;
+    --panel:#171922;
+    --panel2:#21242F;
+    --blood:#E51D2A;
+    --crimson:#E51D2A;
+    --ember:#FF3B5C;
+    --gore:#2E323F;
+    --bone:#FFFFFF;
+    --ash:#A0A5B8;
+    --ash-dim:#6B7080;
+    --sulfur:#FFB627;
+    --display:'Cinzel',Georgia,'Times New Roman',serif;
+    --body:'Spectral',Georgia,serif;
+    --ui:'Oswald','Arial Narrow',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family:var(--body);
+    color:var(--bone);
+    min-height:100vh;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(1100px 620px at 50% -240px, rgba(228,24,39,.15), transparent 62%),
+      radial-gradient(900px 520px at 100% 8%, rgba(197,15,31,.12), transparent 55%),
+      radial-gradient(1100px 900px at 0% 102%, rgba(228,24,39,.20), transparent 60%),
+      var(--void);
+    background-attachment:fixed;
+  }
+  ::selection{background:var(--crimson);color:#fff}
+
+  /* grain + vignette overlays */
+  .grain{position:fixed;inset:0;pointer-events:none;z-index:9000;opacity:0;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .vig{position:fixed;inset:0;pointer-events:none;z-index:8999;
+    box-shadow:inset 0 0 240px 40px rgba(20,24,32,.06)}
+
+  /* ---- Top bar ---- */
+  /* SportyBet-style solid red header */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    padding: 16px 22px;
+    position: relative; z-index: 2;
+    background: var(--crimson);
+    box-shadow: 0 2px 12px rgba(25,30,45,.15);
+  }
+  .top-bar .brand {
+    display: flex; align-items: center; gap: 9px;
+    font-family: var(--display); font-weight: 900;
+    font-size: 17px; letter-spacing: .08em; color: #FFFFFF;
+  }
+  .top-bar .brand .di {
+    color: #FFFFFF;
+    filter: drop-shadow(0 0 7px rgba(0,0,0,.25));
+    font-size: 14px;
+  }
+  .top-bar .spacer { flex: 1; }
+  .top-bar .back-btn {
+    background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.45);
+    border-radius: 3px; color: #FFFFFF;
+    font-family: var(--ui); text-transform: uppercase; letter-spacing: .12em;
+    font-size: 11px; cursor: pointer; padding: 8px 13px; margin-right: 12px; transition: .15s;
+  }
+  .top-bar .back-btn:hover { background: rgba(255,255,255,.25); border-color: #FFFFFF; }
+  .top-bar .logout {
+    background: none; border: none; color: rgba(255,255,255,.85);
+    font-family: var(--ui); text-transform: uppercase; letter-spacing: .12em;
+    font-size: 11px; cursor: pointer; transition: .15s;
+  }
+  .top-bar .logout:hover { color: #FFFFFF; }
+
+  /* ---- Step indicator ---- */
+  .steps-wrap {
+    padding: 26px 20px 6px;
+    display: flex; justify-content: center;
+    position: relative; z-index: 2;
+  }
+  .steps {
+    display: flex; align-items: center; gap: 0;
+    width: 100%; max-width: 420px;
+  }
+  .step-node {
+    display: flex; flex-direction: column; align-items: center;
+    flex: 1; position: relative; cursor: pointer;
+  }
+  .step-node:not(:last-child)::after {
+    content: ""; position: absolute; top: 14px; left: 50%;
+    width: 100%; height: 1.5px;
+    background: rgba(25,28,34,.14); z-index: 0;
+  }
+  .step-node.done:not(:last-child)::after {
+    background: linear-gradient(90deg, var(--crimson), var(--blood));
+  }
+  .step-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 1.5px solid rgba(25,28,34,.2);
+    background: var(--panel);
+    display: grid; place-items: center;
+    font-family: var(--ui); font-size: 11px; font-weight: 600; color: var(--ash-dim);
+    position: relative; z-index: 1; transition: .18s;
+  }
+  .step-node.active .step-dot {
+    border-color: var(--crimson);
+    background: linear-gradient(180deg, var(--crimson), var(--blood));
+    color: #FCEFEC;
+    box-shadow: 0 0 16px rgba(228,24,39,.5);
+  }
+  .step-node.done .step-dot {
+    border-color: var(--crimson);
+    background: linear-gradient(180deg, var(--crimson), var(--blood));
+    color: #FCEFEC;
+  }
+  .step-label {
+    font-family: var(--ui); font-size: 10px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: .1em;
+    color: var(--ash-dim); margin-top: 6px;
+  }
+  .step-node.active .step-label,
+  .step-node.done  .step-label { color: var(--crimson); }
+
+  /* ---- Page header ---- */
+  .pkg-header {
+    text-align: center; padding: 16px 20px 26px;
+    position: relative; z-index: 2;
+  }
+  .pkg-eyebrow {
+    font-family: var(--ui); text-transform: uppercase;
+    letter-spacing: .3em; font-size: 11px; font-weight: 500;
+    color: var(--crimson); display: inline-flex; align-items: center; gap: 10px;
+    margin-bottom: 10px;
+  }
+  .pkg-eyebrow::before { content: "◆"; font-size: 8px; color: var(--blood); }
+  .pkg-header h2 {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0 0 8px;
+    letter-spacing: .01em; color: var(--bone);
+  }
+  .pkg-header p {
+    font-size: 14px; color: var(--ash); margin: 0;
+  }
+
+  /* ---- Package cards ---- */
+  .packages {
+    display: flex; flex-direction: column; gap: 14px;
+    padding: 8px 18px 56px; max-width: 520px;
+    margin: 0 auto; position: relative; z-index: 2;
+  }
+  .pkg-card {
+    background: linear-gradient(180deg, var(--panel2), var(--panel));
+    border: 1px solid rgba(228,24,39,.18);
+    border-radius: 6px;
+    padding: 20px 20px 18px;
+    cursor: pointer; transition: .18s ease;
+    position: relative; overflow: hidden;
+  }
+  .pkg-card::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(420px 220px at 92% 50%, rgba(228,24,39,.08), transparent 62%);
+    pointer-events: none;
+  }
+  .pkg-card:hover {
+    border-color: rgba(228,24,39,.45);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 34px rgba(25,30,45,.14), 0 0 22px rgba(228,24,39,.12);
+  }
+  .pkg-card.selected {
+    border-color: var(--crimson);
+    box-shadow: 0 0 0 1px rgba(228,24,39,.35), 0 12px 38px rgba(197,15,31,.4);
+  }
+
+  .pkg-top {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px; position: relative;
+  }
+  .pkg-price {
+    font-family: var(--display); font-size: 28px; font-weight: 900;
+    color: #157A36; letter-spacing: .01em; line-height: 1;   /* SportyBet money green */
+  }
+  .pkg-avail {
+    font-family: var(--ui); font-size: 9px; font-weight: 600;
+    letter-spacing: .18em; text-transform: uppercase;
+    color: var(--crimson);
+    border: 1px solid rgba(228,24,39,.4);
+    border-radius: 20px; padding: 3px 9px;
+  }
+  .pkg-icon {
+    margin-left: auto; width: 36px; height: 36px;
+    border-radius: 8px;
+    background: rgba(228,24,39,.12);
+    border: 1px solid rgba(228,24,39,.3);
+    display: grid; place-items: center; font-size: 17px; flex: 0 0 auto;
+  }
+
+  .pkg-desc {
+    font-size: 15px; font-weight: 500; color: var(--bone);
+    margin-bottom: 12px; letter-spacing: .01em; position: relative;
+  }
+
+  .pkg-tags {
+    display: flex; gap: 8px; margin-bottom: 16px;
+    flex-wrap: wrap; position: relative;
+  }
+  .pkg-tag {
+    font-family: var(--ui); font-size: 11px; font-weight: 400;
+    text-transform: uppercase; letter-spacing: .08em;
+    color: var(--ash);
+    background: rgba(243,245,248,.5);
+    border: 1px solid rgba(25,28,34,.12);
+    border-radius: 20px; padding: 4px 11px;
+  }
+
+  .pkg-btn {
+    width: 100%;
+    background: linear-gradient(180deg, #26AF53, #1F9E48);   /* Betslip-green CTA */
+    color: #FFFFFF;
+    border: 1px solid #2BBE5C;
+    border-radius: 3px; padding: 14px;
+    font-family: var(--ui); font-size: 13px; font-weight: 600;
+    letter-spacing: .14em; text-transform: uppercase;
+    cursor: pointer; transition: .16s ease;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 8px 26px rgba(31,158,72,.35);
+    position: relative;
+  }
+  .pkg-btn:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 0 22px rgba(31,158,72,.45), 0 10px 32px rgba(31,158,72,.5); }
+  .pkg-btn:active { transform: translateY(0); filter: brightness(.96); }
+  .pkg-btn .arrow { font-size: 15px; }
+
+  /* ---- Payment processing overlay ---- */
+  .paying-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(20,24,32,.9);
+    z-index: 50; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px; text-align: center;
+    backdrop-filter: blur(3px);
+  }
+  .paying-overlay.show { display: flex; }
+  .spinner {
+    width: 46px; height: 46px; border-radius: 50%;
+    border: 3px solid rgba(25,28,34,.16);
+    border-top-color: var(--crimson);
+    animation: spin .8s linear infinite;
+    box-shadow: 0 0 18px rgba(228,24,39,.4);
+  }
+  @keyframes spin { to{ transform:rotate(360deg); } }
+  .paying-overlay p {
+    font-family: var(--ui); text-transform: uppercase; letter-spacing: .2em;
+    font-size: 13px; color: #E8EAEE; margin: 0;   /* sits on the dark dimmer */
+  }
+  .paying-overlay .spinner { border-color: rgba(255,255,255,.25); border-top-color: var(--crimson); }
+
+  /* ---- Toast ---- */
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px);
+    background: var(--panel2); color: var(--bone);
+    border: 1px solid rgba(228,24,39,.4);
+    border-radius: 4px; padding: 13px 22px;
+    font-family: var(--ui); letter-spacing: .06em; font-size: 13px;
+    box-shadow: 0 14px 40px rgba(25,30,45,.16);
+    opacity: 0; pointer-events: none; transition: .25s ease; z-index: 60;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: var(--sulfur); color: var(--sulfur); }
+
+  /* ---- Direct MoMo payment modal ---- */
+  .momo-overlay {
+    display: none; position: fixed; inset: 0; z-index: 55;
+    background: rgba(20,24,32,.9); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center; padding: 18px;
+  }
+  .momo-overlay.show { display: flex; }
+  .momo-card {
+    width: min(94vw, 430px); max-height: 92vh; overflow-y: auto;
+    background: linear-gradient(180deg, var(--panel2), var(--panel));
+    border: 1px solid rgba(228,24,39,.35); border-radius: 8px;
+    padding: 24px 22px; position: relative;
+    box-shadow: 0 24px 70px rgba(25,30,45,.18), 0 0 30px rgba(228,24,39,.12);
+  }
+  .momo-close {
+    position: absolute; top: 12px; right: 12px;
+    background: none; border: 1px solid rgba(25,28,34,.16); border-radius: 3px;
+    color: var(--ash); font-size: 13px; cursor: pointer; padding: 5px 9px; transition: .15s;
+  }
+  .momo-close:hover { color: var(--bone); border-color: var(--crimson); }
+  .momo-eyebrow {
+    font-family: var(--ui); text-transform: uppercase; letter-spacing: .26em;
+    font-size: 10px; color: var(--crimson); margin-bottom: 6px;
+  }
+  .momo-title { font-family: var(--display); font-weight: 700; font-size: 21px; color: var(--bone); margin: 0 0 4px; }
+  .momo-amt { font-family: var(--display); font-weight: 900; font-size: 32px; color: #157A36; margin: 10px 0 14px; }
+  /* ---- Game division picker (football / red & black) ---- */
+  .gpick { display: flex; gap: 12px; max-width: 520px; margin: 0 auto 6px; padding: 0 18px; position: relative; z-index: 2; }
+  .gp {
+    flex: 1; padding: 15px 10px; border: 1.5px solid rgba(25,28,34,.14); border-radius: 10px;
+    background: #FFFFFF; font-family: var(--ui); font-size: 13px; font-weight: 600;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--ash); cursor: pointer; transition: .15s;
+  }
+  .gp.on { border-color: var(--crimson); color: var(--crimson); background: rgba(228,24,39,.06); }
+  .gp .free-tag {
+    display: inline-block; margin-left: 6px; background: #1F9E48; color: #fff;
+    font-size: 10px; padding: 2px 7px; border-radius: 10px; letter-spacing: .1em;
+  }
+
+  .pay-opt {
+    width: 100%; text-align: left; display: flex; align-items: center; gap: 12px;
+    background: rgba(243,245,248,.5); border: 1px solid rgba(25,28,34,.16); border-radius: 6px;
+    padding: 15px 14px; margin-bottom: 9px; cursor: pointer; transition: .15s;
+  }
+  .pay-opt:hover { border-color: var(--crimson); box-shadow: inset 0 0 22px rgba(228,24,39,.1); }
+  .pay-opt .t { font-family: var(--ui); font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--bone); }
+  .pay-opt .s { font-size: 12px; color: var(--ash-dim); margin-top: 3px; }
+  .pay-opt .go { margin-left: auto; color: var(--crimson); font-size: 16px; }
+  .momo-nets { display: flex; gap: 7px; margin: 0 0 12px; flex-wrap: wrap; }
+  .momo-net {
+    flex: 1; min-width: 92px; background: rgba(243,245,248,.5);
+    border: 1px solid rgba(25,28,34,.16); border-radius: 4px; color: var(--ash);
+    font-family: var(--ui); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    padding: 10px 6px; cursor: pointer; transition: .15s;
+  }
+  .momo-net:hover { border-color: rgba(228,24,39,.45); }
+  .momo-net.on { border-color: var(--crimson); color: var(--bone); background: rgba(228,24,39,.14); }
+  .momo-box {
+    background: rgba(243,245,248,.55); border: 1px solid rgba(25,28,34,.14);
+    border-radius: 6px; padding: 4px 14px; margin-bottom: 14px;
+  }
+  .momo-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 11px 0; border-bottom: 1px solid rgba(25,28,34,.08);
+  }
+  .momo-row:last-child { border-bottom: none; }
+  .momo-row .k { font-family: var(--ui); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ash-dim); }
+  .momo-row .v { font-family: var(--ui); font-weight: 600; font-size: 16px; letter-spacing: .06em; color: var(--bone); display: flex; align-items: center; gap: 9px; }
+  .momo-copy {
+    background: rgba(228,24,39,.12); border: 1px solid rgba(228,24,39,.4); border-radius: 3px;
+    color: var(--crimson); font-family: var(--ui); font-size: 10px; letter-spacing: .1em;
+    text-transform: uppercase; padding: 4px 8px; cursor: pointer; transition: .15s;
+  }
+  .momo-copy:hover { background: rgba(228,24,39,.25); color: var(--bone); }
+  .momo-steps { font-size: 13.5px; color: var(--ash); margin: 0 0 14px; padding-left: 18px; }
+  .momo-steps li { margin-bottom: 5px; }
+  .momo-steps b { color: var(--bone); }
+  .momo-label { font-family: var(--ui); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ash); display: block; margin-bottom: 7px; }
+  .momo-input {
+    width: 100%; background: rgba(243,245,248,.6); border: 1px solid rgba(25,28,34,.18);
+    border-radius: 4px; color: var(--bone); font-family: var(--ui); letter-spacing: .05em;
+    font-size: 15px; padding: 13px 14px; outline: none; transition: .15s; margin-bottom: 14px;
+  }
+  .momo-input:focus { border-color: var(--crimson); box-shadow: 0 0 0 3px rgba(228,24,39,.15); }
+  .momo-btn {
+    width: 100%; background: linear-gradient(180deg, #26AF53, #1F9E48);
+    color: #FFFFFF; border: 1px solid #2BBE5C; border-radius: 3px; padding: 14px;
+    font-family: var(--ui); font-size: 13px; font-weight: 600; letter-spacing: .14em;
+    text-transform: uppercase; cursor: pointer; transition: .16s;
+  }
+  .momo-btn:hover { filter: brightness(1.08); }
+  .momo-btn:disabled { opacity: .5; pointer-events: none; }
+  .momo-wait { text-align: center; padding: 12px 4px 6px; }
+  .momo-wait .spinner { margin: 0 auto 18px; }
+  .momo-wait h3 { font-family: var(--display); font-weight: 700; font-size: 19px; color: var(--bone); margin: 0 0 8px; }
+  .momo-wait p { font-size: 13.5px; color: var(--ash); margin: 0 0 6px; }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="vig"></div>
+
+<!-- Top bar -->
+<div class="top-bar">
+  <button class="back-btn" onclick="goBack()">&larr; Back</button>
+  <div class="brand"><span class="di">◆</span>Virtual Oracle</div>
+  <div class="spacer"></div>
+  <button class="logout" onclick="logout()">Log out</button>
+</div>
+
+<!-- Which game's pricing -->
+<div class="gpick" id="gpick">
+  <button class="gp on" id="gp-football" onclick="setPriceGame('football')">⚽ Instant Football</button>
+  <button class="gp" id="gp-rb" onclick="setPriceGame('redblack')">🔴⚫ Red &amp; Black</button>
+</div>
+
+<!-- Step indicator -->
+<div class="steps-wrap">
+  <div class="steps" id="steps-row">
+    <!-- rendered by JS -->
+  </div>
+</div>
+
+<!-- Header -->
+<div class="pkg-header">
+  <div class="pkg-eyebrow">Seal The Pact</div>
+  <h2>Choose Your Package</h2>
+  <p>Buy predictions · No expiry · Use anytime</p>
+</div>
+
+<!-- Current balance (so returning users aren't pushed to pay again) -->
+<div id="balance-banner" style="display:none;max-width:560px;margin:0 auto 24px;padding:14px 18px;border:1px solid var(--border2);border-radius:14px;background:linear-gradient(180deg,rgba(228,24,39,.09),transparent);align-items:center;gap:14px;flex-wrap:wrap">
+  <div style="flex:1;min-width:0">
+    <div id="balance-text" style="font-weight:800;font-size:15px;color:var(--chalk)"></div>
+    <div style="font-size:12px;color:var(--muted);margin-top:3px">You already have predictions — no need to buy again.</div>
+  </div>
+  <a href="dashboard.html" style="text-decoration:none;white-space:nowrap;flex:0 0 auto;background:var(--green);color:#F3F5F8;font-weight:800;font-size:13px;padding:11px 18px;border-radius:9px">Go to dashboard →</a>
+</div>
+
+<!-- Package cards -->
+<div class="packages" id="packages-list">
+  <!-- rendered by JS -->
+</div>
+
+<!-- Red & Black pricing -->
+<div class="packages" id="rb-pricing" style="display:none">
+  <div class="pkg-card selected">
+    <div class="pkg-top">
+      <div>
+        <div class="pkg-price">GHS 500</div>
+        <div class="pkg-local" id="rb-local" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
+      </div>
+      <span class="pkg-avail">Available</span>
+      <div class="pkg-icon">🃏</div>
+    </div>
+    <div class="pkg-desc">Upload 3 screenshots of your Red &amp; Black bet history — we scan them and predict your next 3 colours.</div>
+    <div class="pkg-tags">
+      <span class="pkg-tag">3 screenshots</span>
+      <span class="pkg-tag">3 predictions</span>
+    </div>
+    <button class="pkg-btn" onclick="payFor(RB_PKG)">
+      <span class="arrow">→</span> GET RED &amp; BLACK
+    </button>
+  </div>
+</div>
+
+<!-- Payment overlay -->
+<div class="paying-overlay" id="paying-overlay">
+  <div class="spinner" id="paying-spinner"></div>
+  <p class="paying-text" id="paying-text">Opening payment…</p>
+  <div id="paying-actions" style="display:none;gap:10px;margin-top:14px;flex-direction:column;align-items:center">
+    <button id="paying-check" style="min-width:200px;padding:12px 20px;border:none;border-radius:10px;background:#b8123a;color:#fff;font-weight:700;font-size:15px;cursor:pointer">I've paid — check again</button>
+    <a id="paying-dash" href="dashboard.html" style="color:#fff;opacity:.8;font-size:14px;text-decoration:underline">Go to my dashboard</a>
+  </div>
+</div>
+
+<!-- Direct MoMo payment modal (provider = manual) -->
+<div class="momo-overlay" id="momo-overlay">
+  <div class="momo-card">
+    <button class="momo-close" onclick="closeMomoModal()">✕</button>
+    <div id="momo-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="gateways.js"></script>
+<script src="api.js"></script>
+<script>
+/* ================================================================
+   Virtual Oracle — Pricing / Package selection (API-backed via window.VE)
+   The Paystack key + currency are loaded from the server payment config.
+   ================================================================ */
+let PAYSTACK_PUBLIC_KEY = 'pk_test_REPLACE_WITH_YOUR_PAYSTACK_PUBLIC_KEY';
+let PAY_CURRENCY = 'GHS';
+let PAY_BUSINESS = 'Virtual Oracle';
+let PAY_PROVIDER = 'paystack';
+let PAY_MOMO_ACCOUNTS = [];   // direct-MoMo wallets [{network,number,name}] (provider = manual)
+let PAY_BANK_ACCOUNTS = [];   // bank-transfer accounts [{bank,number,name}] (provider = bank)
+let PAY_METHODS = [];         // enabled methods [{id,key}] — buyer picks one when several
+
+/* ---- Auth guard ---- */
+const SESSION = (()=>{
+  if(!VE.isMember()){ window.location.href = 'login.html'; return null; }
+  return VE.cachedMe() || {};
+})();
+if(!SESSION) throw new Error('redirect');
+
+/* Load gateway config from the server */
+(async function loadPayConfig(){
+  try {
+    const cfg = await VE.paymentConfigPublic();
+    if(cfg){
+      if(cfg.key) PAYSTACK_PUBLIC_KEY = cfg.key;
+      if(cfg.currency) PAY_CURRENCY = cfg.currency;
+      if(cfg.business) PAY_BUSINESS = cfg.business;
+      if(Array.isArray(cfg.momoAccounts)) PAY_MOMO_ACCOUNTS = cfg.momoAccounts.filter(a => a && a.number);
+      if(Array.isArray(cfg.bankAccounts)) PAY_BANK_ACCOUNTS = cfg.bankAccounts.filter(a => a && a.number);
+      if(Array.isArray(cfg.methods)){
+        // direct methods are only offerable if their receiving accounts exist
+        PAY_METHODS = cfg.methods.filter(m => m && m.id
+          && (m.id !== 'manual' || PAY_MOMO_ACCOUNTS.length)
+          && (m.id !== 'bank' || PAY_BANK_ACCOUNTS.length));
+      }
+      PAY_PROVIDER = (cfg.provider && window.VEPay && VEPay.has(cfg.provider))
+        ? cfg.provider
+        : ((window.VEPay && VEPay.providerForKey(PAYSTACK_PUBLIC_KEY)) || 'paystack');
+    }
+  } catch(e){}
+})();
+
+/* Local-currency prices (display only — checkout still charges GHS).
+   Rates are GHS → local; approximate, edit as the market moves. */
+const CURRENCIES = {
+  '+234': { code:'NGN', sym:'₦',    rate:140  },  // Nigeria
+  '+254': { code:'KES', sym:'KSh ', rate:12.5 },  // Kenya
+  '+255': { code:'TZS', sym:'TSh ', rate:240  },  // Tanzania
+  '+260': { code:'ZMW', sym:'ZK ',  rate:2.5  },  // Zambia
+  '+27':  { code:'ZAR', sym:'R ',   rate:1.8  },  // South Africa
+  // +233 Ghana = base GHS, no conversion shown
+};
+let LOCAL = null;   // the buyer's local currency (null = Ghana/GHS → charge GHS)
+/* Which direct-payment rails this buyer should see, from the phone number they
+   registered with: Ghanaian numbers get the MoMo wallets, Nigerian (+234)
+   numbers get the bank accounts. Everyone else gets gateways only. */
+let BUYER_COUNTRY = 'GH';   // local-format numbers (no + prefix) are Ghana
+function setBuyerCountry(acct){
+  acct = String(acct || '').trim();
+  if(acct.startsWith('+') && !acct.startsWith('+233')){
+    BUYER_COUNTRY = acct.startsWith('+234') ? 'NG' : 'OTHER';
+  } else {
+    BUYER_COUNTRY = 'GH';
+  }
+}
+function applyLocalCurrency(sportyAccount){
+  const acct = String(sportyAccount || '');
+  const prefix = Object.keys(CURRENCIES).sort((a,b)=>b.length-a.length).find(p => acct.startsWith(p));
+  if(!prefix) return;                       // Ghana or unknown → GHS only
+  const cur = CURRENCIES[prefix];
+  LOCAL = cur;                              // charge this currency (Cowrie supports it)
+  PACKAGES.forEach((p, i) => {
+    const el = document.getElementById('pkg-local-' + i);
+    if(el) el.textContent = cur.sym + Math.round(p.price * cur.rate).toLocaleString() + ' ' + cur.code;
+  });
+  const rbl = document.getElementById('rb-local');
+  if(rbl) rbl.textContent = cur.sym + Math.round(RB_PKG.price * cur.rate).toLocaleString() + ' ' + cur.code;
+}
+
+/* Load the member's balance + show local-currency prices (from their country) */
+(async function initPricing(){
+  // pull admin-set exchange rates (fall back to the defaults above)
+  try {
+    const rates = await VE.fxRates();
+    Object.values(CURRENCIES).forEach(c => { if(rates && rates[c.code] > 0) c.rate = rates[c.code]; });
+  } catch(e){}
+
+  let me;
+  try { me = await VE.me(); } catch(e){ return; }
+  setBuyerCountry(me.user && me.user.sportyAccount);
+  applyLocalCurrency(me.user && me.user.sportyAccount);
+
+  // Registration fee not paid yet → this visit is about the fee, nothing else
+  if(me.user && me.user.regFeePaid === false){
+    FEE_DUE = true;
+    renderFeeMode();
+    return;
+  }
+
+  const credits = me.credits || 0;
+  const uu = (me.user && me.user.unlimitedUntil) || 0;
+  const unlimited = uu && Date.now() < uu;
+  if(!credits && !unlimited) return;
+  const txt = document.getElementById('balance-text');
+  if(unlimited){
+    const ms = uu - Date.now();
+    const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000);
+    txt.textContent = '✦ Unlimited predictions — ' + (h >= 1 ? h + 'h left' : (m >= 1 ? m + 'm left' : 'expiring soon'));
+  } else {
+    txt.textContent = '⚡ ' + credits + ' prediction' + (credits === 1 ? '' : 's') + ' available';
+  }
+  document.getElementById('balance-banner').style.display = 'flex';
+})();
+
+/* One-time registration fee: gates new accounts until paid (server enforces
+   the flag; this page collects the payment through the normal rails). */
+const FEE_PKG = { id:'fee', price:50, label:'GHS 50', preds:0, desc:'One-time registration fee', icon:'🎫', tag:'Registration' };
+let FEE_DUE = false;
+
+/* ---- Packages ----
+   NOTE: if you change prices/credits here (or RB_PKG below), update
+   CLAIM_PACKAGES in server.js too — direct-payment (MoMo/bank) claims are
+   validated against that list. */
+const RB_PKG = { id:'rb500', price:500, label:'GHS 500 · Red & Black', preds:3, desc:'Red & Black — 3 screenshots, 3 predictions', icon:'🃏', tag:'Red & Black' };
+const PACKAGES = [
+  { id:'p250', price:250, label:'GHS 250', preds:2, desc:'2 predictions per screenshot', icon:'⚡', tag:'2 predictions' },
+  { id:'p350', price:350, label:'GHS 350', preds:3, desc:'3 predictions per screenshot', icon:'🔥', tag:'3 predictions' },
+  { id:'p500', price:500, label:'GHS 500', preds:4, desc:'4 predictions per screenshot', icon:'💎', tag:'4 predictions' },
+];
+
+/* ---- Render step nodes ---- */
+const stepsRow = document.getElementById('steps-row');
+PACKAGES.forEach((p, i) => {
+  stepsRow.innerHTML += `
+    <div class="step-node" id="sn-${i}">
+      <div class="step-dot">${i+1}</div>
+      <div class="step-label">${p.label.replace('GHS ','')}</div>
+    </div>`;
+});
+
+/* ---- Render package cards ---- */
+const list = document.getElementById('packages-list');
+PACKAGES.forEach((p, i) => {
+  list.innerHTML += `
+    <div class="pkg-card" id="pc-${i}" onclick="selectPackage(${i})">
+      <div class="pkg-top">
+        <div>
+          <div class="pkg-price">${p.label}</div>
+          <div class="pkg-local" id="pkg-local-${i}" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
+        </div>
+        <span class="pkg-avail">Available</span>
+        <div class="pkg-icon">${p.icon}</div>
+      </div>
+      <div class="pkg-desc">${p.desc}</div>
+      <div class="pkg-tags">
+        <span class="pkg-tag">${p.tag}</span>
+        ${p.preds === 999 ? '<span class="pkg-tag">Expires in 24h</span>' : '<span class="pkg-tag">No expiry</span>'}
+      </div>
+      <button class="pkg-btn" onclick="buyPackage(event, ${i})">
+        <span class="arrow">→</span> GET ${p.label.toUpperCase()}
+      </button>
+    </div>`;
+});
+
+/* ---- Highlight step / card ---- */
+let activeIdx = -1;
+function selectPackage(i){
+  activeIdx = i;
+  document.querySelectorAll('.pkg-card').forEach((c,j)=>{
+    c.classList.toggle('selected', j===i);
+  });
+  document.querySelectorAll('.step-node').forEach((n,j)=>{
+    n.classList.remove('active','done');
+    if(j < i)  n.classList.add('done');
+    if(j === i) n.classList.add('active');
+  });
+}
+
+/* ---- Payment ---- */
+/* Where to send the buyer once this payment lands: fee payers continue the
+   signup (connect SportyBet); package buyers go to the dashboard. */
+const postPayUrl = () => (FEE_DUE ? 'login.html#sporty' : 'dashboard.html');
+
+/* ---- Which game's pricing is on show ---- */
+function setPriceGame(g){
+  document.getElementById('gp-football').classList.toggle('on', g === 'football');
+  document.getElementById('gp-rb').classList.toggle('on', g === 'redblack');
+  document.querySelector('.steps-wrap').style.display = g === 'football' ? '' : 'none';
+  document.getElementById('packages-list').style.display = g === 'football' ? '' : 'none';
+  document.getElementById('rb-pricing').style.display = g === 'redblack' ? '' : 'none';
+}
+
+/* Fee-mode screen: one card, no packages, no step indicator */
+function renderFeeMode(){
+  const gp = document.getElementById('gpick'); if(gp) gp.style.display = 'none';
+  const rbp = document.getElementById('rb-pricing'); if(rbp) rbp.style.display = 'none';
+  const sw = document.querySelector('.steps-wrap'); if(sw) sw.style.display = 'none';
+  const bb = document.getElementById('balance-banner'); if(bb) bb.style.display = 'none';
+  const h = document.querySelector('.pkg-header h2'); if(h) h.textContent = 'Activate Your Account';
+  const p = document.querySelector('.pkg-header p'); if(p) p.textContent = 'Pay the one-time GHS 50 registration fee, then connect your SportyBet account.';
+  document.getElementById('packages-list').innerHTML = `
+    <div class="pkg-card selected">
+      <div class="pkg-top">
+        <div><div class="pkg-price">GHS 50</div><div class="pkg-local" id="fee-local" style="font-size:12px;color:var(--muted);margin-top:2px"></div></div>
+        <span class="pkg-avail">One-time</span>
+        <div class="pkg-icon">🎫</div>
+      </div>
+      <div class="pkg-desc">Registration fee — activates your Virtual Oracle account.</div>
+      <div class="pkg-tags">
+        <span class="pkg-tag">Pay once</span>
+        <span class="pkg-tag">Then connect SportyBet</span>
+      </div>
+      <div style="font-family:var(--ui);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ash);margin:2px 0 10px">Where are you paying from?</div>
+      <button class="pay-opt" type="button" onclick="feeCountry('GH')">
+        <div><div class="t">🇬🇭 I'm Ghanaian</div><div class="s">Pay with Mobile Money</div></div><span class="go">→</span>
+      </button>
+      <button class="pay-opt" type="button" onclick="feeCountry('NG')">
+        <div><div class="t">🇳🇬 I'm Nigerian</div><div class="s">Pay by bank transfer</div></div><span class="go">→</span>
+      </button>
+    </div>`;
+}
+
+/* Fee payers haven't linked a number yet, so they tell us the country —
+   that picks the direct rail exactly like the number prefix does later. */
+function feeCountry(c){
+  BUYER_COUNTRY = c;
+  payFor(FEE_PKG);
+}
+
+function buyPackage(e, i){
+  e.stopPropagation();
+  selectPackage(i);
+  payFor(PACKAGES[i]);
+}
+
+function payFor(pkg){
+  if(FEE_DUE && pkg.id !== 'fee'){ toast('Please pay the one-time registration fee first.', 'error'); pkg = FEE_PKG; }
+  // Methods the admin has toggled on; older configs fall back to the single provider.
+  let methods = PAY_METHODS.length ? PAY_METHODS
+    : [{ id: PAY_PROVIDER, key: PAYSTACK_PUBLIC_KEY }];
+  // Direct rails are country-routed: MoMo for Ghanaians, bank for Nigerians
+  // (fee payers choose their country; members are routed by their number).
+  methods = methods.filter(m =>
+    (m.id !== 'manual' || BUYER_COUNTRY === 'GH') &&
+    (m.id !== 'bank'   || BUYER_COUNTRY === 'NG'));
+  if(!methods.length){ toast('Payment is temporarily unavailable for your region. Please contact support.', 'error'); return; }
+  if(methods.length > 1) return openMethodPicker(pkg, methods);
+  startPayment(pkg, methods[0]);
+}
+
+function startPayment(pkg, m){
+  // Direct MoMo: no gateway — show our number, the buyer sends the money
+  // from their wallet, and the admin confirms before credits are granted.
+  if(m.id === 'manual' || m.id === 'bank'){
+    // Already waiting on a deposit? Show that instead of taking another one —
+    // resubmitting the same payment just crowds the admin's review queue.
+    let pendingId = '';
+    try { pendingId = localStorage.getItem('ve_momo_claim') || ''; } catch(e){}
+    if(pendingId){
+      toast('Your previous deposit is still awaiting confirmation.');
+      momoWait(pendingId);
+      return;
+    }
+  }
+  if(m.id === 'manual'){
+    if(!PAY_MOMO_ACCOUNTS.length){ toast('Payment is temporarily unavailable. Please try again shortly.', 'error'); return; }
+    openMomoModal(pkg);
+    return;
+  }
+  if(m.id === 'bank'){
+    if(!PAY_BANK_ACCOUNTS.length){ toast('Payment is temporarily unavailable. Please try again shortly.', 'error'); return; }
+    openBankModal(pkg);
+    return;
+  }
+
+  // No real gateway key loaded → fail safe, never simulate a payment.
+  if(!m.key || m.key.includes('REPLACE')){
+    toast('Payment is temporarily unavailable. Please refresh and try again.', 'error');
+    return;
+  }
+
+  document.getElementById('paying-overlay').classList.add('show');
+  const ref = 'VE_' + Date.now() + '_' + Math.random().toString(36).slice(2,6).toUpperCase();
+
+  // Charge in the buyer's own currency (Nigeria → NGN, etc.) so Cowrie shows
+  // their national payment methods. Ghana / unknown → GHS.
+  const chargeCurrency = LOCAL ? LOCAL.code : PAY_CURRENCY;
+  const chargeAmount   = LOCAL ? Math.round(pkg.price * LOCAL.rate) : pkg.price;
+
+  VEPay.checkout(
+    m.id,
+    { key: m.key, business: PAY_BUSINESS },
+    {
+      email: SESSION.email,
+      name: SESSION.name,
+      amount: chargeAmount,
+      currency: chargeCurrency,
+      reference: ref,
+      metadata: { name: SESSION.name, business: PAY_BUSINESS, package: pkg.label, predictions: pkg.tag, credits: (pkg.preds === 999 ? 9999 : pkg.preds), email: SESSION.email },
+    },
+    {
+      onSuccess: (reference) => onPaymentSuccess(pkg, reference || ref),
+      onCancel: () => {
+        document.getElementById('paying-overlay').classList.remove('show');
+        toast('Payment cancelled.');
+      },
+      onError: (msg) => {
+        document.getElementById('paying-overlay').classList.remove('show');
+        toast(msg || 'Payment error. Please try again.', 'error');
+      },
+    }
+  );
+}
+
+/* Buyer-facing chooser when more than one method is enabled (reuses the
+   MoMo modal shell). */
+const METHOD_LABELS = {
+  paystack:    ['Paystack', 'Card & mobile money'],
+  flutterwave: ['Flutterwave', 'Card, mobile money, USSD & bank'],
+  cowrie:      ['Online Checkout', 'Card & mobile money'],
+  manual:      ['Direct MoMo Transfer', 'Send to our wallet — confirmed by our team'],
+  bank:        ['Bank Transfer', 'Send to our bank account — confirmed by our team'],
+};
+function openMethodPicker(pkg, methods){
+  const b = document.getElementById('momo-body');
+  b.innerHTML = `
+    <div class="momo-eyebrow">Checkout</div>
+    <h3 class="momo-title">Choose payment method</h3>
+    <div class="momo-amt">${esc(pkg.label)}</div>
+    <div id="pay-opts"></div>`;
+  const box = b.querySelector('#pay-opts');
+  methods.forEach(m => {
+    const L = METHOD_LABELS[m.id] || [m.id, ''];
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pay-opt';
+    btn.innerHTML = `<div><div class="t">${esc(L[0])}</div><div class="s">${esc(L[1])}</div></div><span class="go">→</span>`;
+    btn.addEventListener('click', () => { closeMomoModal(); startPayment(pkg, m); });
+    box.appendChild(btn);
+  });
+  document.getElementById('momo-overlay').classList.add('show');
+}
+
+async function onPaymentSuccess(pkg, ref){
+  const add = pkg.preds === 999 ? 9999 : pkg.preds;
+  try {
+    await VE.recordPurchase({ pkg: pkg.label, reference: ref, predictions: add });
+    try { localStorage.removeItem('ve_pending_ref'); } catch(e){}
+    document.getElementById('paying-overlay').classList.remove('show');
+    toast('Payment successful! Redirecting…', 'success');
+    setTimeout(() => { window.location.href = postPayUrl(); }, 1200);
+  } catch(e){
+    document.getElementById('paying-overlay').classList.remove('show');
+    toast(e.message || 'Could not record purchase.', 'error');
+  }
+}
+
+/* ================= Direct MoMo payment (manual provider) =================
+   The buyer sends the money straight to the admin's MoMo number, submits the
+   transaction ID from their SMS, and we poll until the admin approves the
+   claim (which is when the server grants the credits). */
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let momoPollTimer = null;
+function momoStopPoll(){ if(momoPollTimer){ clearInterval(momoPollTimer); momoPollTimer = null; } }
+
+/* Hide the modal only — any active poll keeps running so the buyer is still
+   redirected when the admin confirms while they browse. */
+function closeMomoModal(){ document.getElementById('momo-overlay').classList.remove('show'); }
+
+let momoSelIdx = 0;   // which wallet the buyer picked when there are several
+function openMomoModal(pkg){ momoSelIdx = 0; renderMomoForm(pkg, ''); }
+
+function renderMomoForm(pkg, keepTxid){
+  const accs = PAY_MOMO_ACCOUNTS;
+  if(momoSelIdx >= accs.length) momoSelIdx = 0;
+  const a = accs[momoSelIdx];
+  const tabs = accs.length > 1
+    ? `<div class="momo-nets">${accs.map((x, i) =>
+        `<button type="button" class="momo-net${i === momoSelIdx ? ' on' : ''}" data-i="${i}">${esc(x.network || 'Number ' + (i + 1))}</button>`
+      ).join('')}</div>`
+    : '';
+  const b = document.getElementById('momo-body');
+  b.innerHTML = `
+    <div class="momo-eyebrow">Mobile Money</div>
+    <h3 class="momo-title">Pay by MoMo transfer</h3>
+    <div class="momo-amt">${esc(pkg.label)}</div>
+    ${tabs}
+    <div class="momo-box">
+      ${a.network ? `<div class="momo-row"><span class="k">Network</span><span class="v">${esc(a.network)}</span></div>` : ''}
+      <div class="momo-row"><span class="k">Send to</span>
+        <span class="v">${esc(a.number)} <button class="momo-copy" onclick="momoCopy(this)">Copy</button></span></div>
+      ${a.name ? `<div class="momo-row"><span class="k">Name on number</span><span class="v">${esc(a.name)}</span></div>` : ''}
+      <div class="momo-row"><span class="k">Amount</span><span class="v">${esc(pkg.label)}</span></div>
+    </div>
+    <ol class="momo-steps">
+      <li>Send <b>${esc(pkg.label)}</b> to the ${a.network ? `<b>${esc(a.network)}</b>` : 'mobile money'} number above from your wallet.</li>
+      <li>Enter the <b>name registered on the MoMo number</b> you sent from.</li>
+      <li>Your payment is matched by that name and confirmed shortly after.</li>
+    </ol>
+    <label class="momo-label" for="momo-txid">Name on your MoMo number</label>
+    <input class="momo-input" id="momo-txid" placeholder="e.g. Kwame Mensah" autocomplete="name" spellcheck="false" style="letter-spacing:normal">
+    <button class="momo-btn" id="momo-send">I've sent the money</button>`;
+  if(keepTxid) document.getElementById('momo-txid').value = keepTxid;
+  document.getElementById('momo-overlay').classList.add('show');
+  document.getElementById('momo-send').onclick = () => momoSubmit(pkg);
+  b.querySelectorAll('.momo-net').forEach(t => t.addEventListener('click', () => {
+    momoSelIdx = +t.dataset.i;
+    renderMomoForm(pkg, (document.getElementById('momo-txid') || {}).value || '');
+  }));
+}
+
+function momoCopy(btn){
+  const val = (btn.dataset && btn.dataset.c) || (PAY_MOMO_ACCOUNTS[momoSelIdx] || {}).number || '';
+  try { navigator.clipboard && navigator.clipboard.writeText(val).catch(()=>{}); } catch(e){}
+  btn.textContent = 'Copied'; setTimeout(() => { btn.textContent = 'Copy'; }, 1400);
+}
+
+/* ---- Direct bank transfer: same claim flow, bank details instead of a wallet ---- */
+let bankSelIdx = 0;
+function openBankModal(pkg){ bankSelIdx = 0; BANK_PROOF = ''; renderBankForm(pkg); }
+
+/* What the buyer must actually send: their local currency when we know it
+   (e.g. ₦ for +234 numbers, from the admin-set rates), else GHS. */
+function localAmount(pkg){
+  if(LOCAL) return LOCAL.sym + Math.round(pkg.price * LOCAL.rate).toLocaleString() + ' ' + LOCAL.code;
+  // Fee payers who chose Nigeria have no linked number yet — still show the
+  // naira estimate next to the GHS amount.
+  if(BUYER_COUNTRY === 'NG' && CURRENCIES['+234'] && CURRENCIES['+234'].rate){
+    return pkg.label + ' (≈ ₦' + Math.round(pkg.price * CURRENCIES['+234'].rate).toLocaleString() + ')';
+  }
+  return pkg.label;
+}
+
+function renderBankForm(pkg){
+  const accs = PAY_BANK_ACCOUNTS;
+  if(bankSelIdx >= accs.length) bankSelIdx = 0;
+  const a = accs[bankSelIdx];
+  const amt = localAmount(pkg);
+  const tabs = accs.length > 1
+    ? `<div class="momo-nets">${accs.map((x, i) =>
+        `<button type="button" class="momo-net${i === bankSelIdx ? ' on' : ''}" data-i="${i}">${esc(x.bank || 'Account ' + (i + 1))}</button>`
+      ).join('')}</div>`
+    : '';
+  const b = document.getElementById('momo-body');
+  b.innerHTML = `
+    <div class="momo-eyebrow">Bank Transfer</div>
+    <h3 class="momo-title">Pay by bank transfer</h3>
+    <div class="momo-amt">${esc(amt)}</div>
+    ${tabs}
+    <div class="momo-box">
+      ${a.bank ? `<div class="momo-row"><span class="k">Bank</span><span class="v">${esc(a.bank)}</span></div>` : ''}
+      <div class="momo-row"><span class="k">Account number</span>
+        <span class="v">${esc(a.number)} <button class="momo-copy" data-c="${esc(a.number)}" onclick="momoCopy(this)">Copy</button></span></div>
+      ${a.name ? `<div class="momo-row"><span class="k">Account name</span><span class="v">${esc(a.name)}</span></div>` : ''}
+      <div class="momo-row"><span class="k">Amount</span><span class="v">${esc(amt)}</span></div>
+    </div>
+    <ol class="momo-steps">
+      <li>Transfer <b>${esc(amt)}</b> to the account above from your banking app${a.bank ? ' (' + esc(a.bank) + ')' : ''}.</li>
+      <li>Attach a <b>screenshot of the receipt</b> — your predictions are added once the payment is confirmed.</li>
+    </ol>
+    <label class="momo-label" for="bank-proof">Receipt screenshot</label>
+    <input class="momo-input" id="bank-proof" type="file" accept="image/*" style="padding:10px 14px">
+    <div id="bank-proof-prev" style="display:none;margin:-6px 0 14px"><img style="max-width:100%;max-height:150px;border-radius:6px;border:1px solid rgba(25,28,34,.15)"></div>
+    <button class="momo-btn" id="momo-send">I've sent the money</button>`;
+  document.getElementById('momo-overlay').classList.add('show');
+  document.getElementById('momo-send').onclick = () => bankSubmit(pkg);
+  b.querySelectorAll('.momo-net').forEach(t => t.addEventListener('click', () => {
+    bankSelIdx = +t.dataset.i;
+    renderBankForm(pkg);
+  }));
+  // compress + preview the chosen receipt right away (kept across bank-tab switches)
+  if(BANK_PROOF){
+    const pv = document.getElementById('bank-proof-prev');
+    pv.querySelector('img').src = BANK_PROOF;
+    pv.style.display = '';
+  }
+  document.getElementById('bank-proof').addEventListener('change', async function(){
+    BANK_PROOF = '';
+    const f = this.files && this.files[0];
+    if(!f) return;
+    try {
+      BANK_PROOF = await imageToDataUrl(f);
+      const pv = document.getElementById('bank-proof-prev');
+      pv.querySelector('img').src = BANK_PROOF;
+      pv.style.display = '';
+    } catch(e){ toast('Could not read that image — try a normal screenshot (PNG/JPG).', 'error'); }
+  });
+}
+
+/* Downscale the receipt to keep uploads small (max 1100px, JPEG) */
+let BANK_PROOF = '';
+function imageToDataUrl(file){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const scale = Math.min(1, 1100 / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      resolve(c.toDataURL('image/jpeg', .82));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('bad image')); };
+    img.src = url;
+  });
+}
+
+async function bankSubmit(pkg){
+  if(!BANK_PROOF){ toast('Attach a screenshot of your transfer receipt.', 'error'); return; }
+  const btn = document.getElementById('momo-send');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+  const acc = PAY_BANK_ACCOUNTS[bankSelIdx] || {};
+  try {
+    const r = await VE.manualClaim({
+      pkg: pkg.label,
+      credits: pkg.preds === 999 ? 9999 : pkg.preds,
+      // tell the admin which bank to check and the local amount actually sent
+      amount: localAmount(pkg) + ' · Bank' + (acc.bank ? ' — ' + acc.bank : ''),
+      txid: '',
+      method: 'bank',
+      proof: BANK_PROOF,
+    });
+    try { localStorage.setItem('ve_momo_claim', String(r.id)); } catch(e){}
+    momoWait(r.id);
+  } catch(e){
+    btn.disabled = false; btn.textContent = "I've sent the money";
+    toast(e.message || 'Could not submit. Please try again.', 'error');
+  }
+}
+
+async function momoSubmit(pkg){
+  const inp = document.getElementById('momo-txid');
+  const txid = (inp.value || '').trim();
+  if(txid.length < 4){ toast('Enter the name on the MoMo number you paid from.', 'error'); inp.focus(); return; }
+  const btn = document.getElementById('momo-send');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+  const acc = PAY_MOMO_ACCOUNTS[momoSelIdx] || {};
+  try {
+    const r = await VE.manualClaim({
+      pkg: pkg.label,
+      credits: pkg.preds === 999 ? 9999 : pkg.preds,
+      // tell the admin which wallet to check for the money
+      amount: pkg.label + (acc.network ? ' · ' + acc.network : ''),
+      txid,
+      method: 'momo',
+    });
+    try { localStorage.setItem('ve_momo_claim', String(r.id)); } catch(e){}
+    momoWait(r.id);
+  } catch(e){
+    btn.disabled = false; btn.textContent = "I've sent the money";
+    toast(e.message || 'Could not submit. Please try again.', 'error');
+  }
+}
+
+function momoWait(id){
+  const b = document.getElementById('momo-body');
+  b.innerHTML = `
+    <div class="momo-wait">
+      <div class="spinner"></div>
+      <h3>Waiting for confirmation</h3>
+      <p>We're checking that your payment arrived. Your predictions are added the moment it's confirmed — usually within a few minutes.</p>
+      <p style="color:var(--ash-dim);font-size:12.5px">You can close this window — we'll bring you to your dashboard once it's confirmed.</p>
+    </div>`;
+  document.getElementById('momo-overlay').classList.add('show');
+  momoStopPoll();
+  momoPollTimer = setInterval(async () => {
+    try {
+      const s = await VE.manualClaimStatus(id);
+      if(s.status === 'approved'){
+        momoStopPoll();
+        try { localStorage.removeItem('ve_momo_claim'); } catch(e){}
+        toast('Payment confirmed! Redirecting…', 'success');
+        setTimeout(() => { window.location.href = postPayUrl(); }, 1000);
+      } else if(s.status === 'rejected'){
+        momoStopPoll();
+        try { localStorage.removeItem('ve_momo_claim'); } catch(e){}
+        b.innerHTML = `<div class="momo-wait"><h3>Payment not confirmed</h3>
+          <p>We couldn't match this transaction. If you did send the money, please contact support with your transaction ID.</p></div>`;
+        document.getElementById('momo-overlay').classList.add('show');
+      }
+    } catch(e){
+      // stale claim id (e.g. cleared server-side) → stop; anything else is transient
+      if(e && e.status === 404){ momoStopPoll(); try { localStorage.removeItem('ve_momo_claim'); } catch(_){} }
+    }
+  }, 5000);
+}
+
+/* Resume a pending claim if the buyer left and came back */
+(function resumeMomoClaim(){
+  let id = '';
+  try { id = localStorage.getItem('ve_momo_claim') || ''; } catch(e){}
+  if(id) momoWait(id);
+})();
+
+/* When the buyer taps "I've made the payment" on Cowrie, it redirects them
+   back here (our callbackUrl = pricing.html). We then confirm the charge with
+   the server (which re-checks Cowrie) and, once it's paid, send them to the
+   upload/dashboard page. Works on mobile full-page redirects. */
+function setPayingText(msg){ const t = document.getElementById('paying-text'); if(t) t.textContent = msg; }
+function showPayingActions(show){
+  const a = document.getElementById('paying-actions'); const sp = document.getElementById('paying-spinner');
+  if(a) a.style.display = show ? 'flex' : 'none';
+  if(sp) sp.style.display = show ? 'none' : 'block';
+}
+
+/* Poll the server until the payment is confirmed, then go to the dashboard.
+   Returns true if confirmed (and redirected), false if it timed out. */
+async function confirmPending(ref, deadlineMs){
+  while(Date.now() < deadlineMs){
+    try {
+      const r = await VE.recordPurchase({ reference: ref });   // server verifies with Cowrie
+      if(r && r.ok){                                           // paid (or already credited by the webhook)
+        try { localStorage.removeItem('ve_pending_ref'); } catch(e){}
+        setPayingText('Payment confirmed! Continuing…');
+        window.location.href = postPayUrl();
+        return true;
+      }
+    } catch(err){
+      const st = err && err.status;
+      if(st === 402 || st === 502){ /* not confirmed yet / transient — keep waiting */ }
+      else if(st === 403){ setPayingText('This payment belongs to another account. Please sign in with the account you paid from.'); return false; }
+      else { setPayingText((err && err.message) || 'We couldn’t confirm this payment.'); return false; }
+    }
+    await new Promise(res => setTimeout(res, 3000));
+  }
+  return false;   // timed out
+}
+
+(async function handlePaymentReturn(){
+  let ref = '';
+  try { ref = localStorage.getItem('ve_pending_ref') || ''; } catch(e){}
+  if(!ref) return;
+  const overlay = document.getElementById('paying-overlay');
+  showPayingActions(false);
+  setPayingText('Confirming your payment…');
+  if(overlay) overlay.classList.add('show');
+
+  // Mobile-money can take up to a minute or so — wait patiently before giving up.
+  const done = await confirmPending(ref, Date.now() + 150000);
+  if(done) return;   // confirmed → already redirecting
+
+  // Timed out: keep the reference so the webhook (or a manual re-check) can still
+  // finish it, and let the buyer either check again or head to the dashboard.
+  setPayingText('Still waiting for your payment to confirm. This can take a minute — tap below to check again.');
+  showPayingActions(true);
+  const btn = document.getElementById('paying-check');
+  if(btn) btn.onclick = async () => {
+    let r2 = ''; try { r2 = localStorage.getItem('ve_pending_ref') || ref; } catch(e){ r2 = ref; }
+    showPayingActions(false);
+    setPayingText('Checking…');
+    const ok = await confirmPending(r2, Date.now() + 60000);
+    if(!ok){ setPayingText('Not confirmed yet. If you’ve paid, your predictions will appear shortly.'); showPayingActions(true); }
+  };
+})();
+
+/* ---- Toast ---- */
+let toastT;
+function toast(msg, type=''){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast' + (type ? ' '+type : '');
+  void el.offsetWidth;
+  el.classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+/* ---- Back ---- */
+function goBack(){
+  if(window.history.length > 1) window.history.back();
+  else window.location.href = 'dashboard.html';
+}
+
+/* ---- Logout ---- */
+function logout(){
+  VE.signOutMember();
+  window.location.href = 'login.html';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="SportyBet">
+  <rect width="120" height="120" rx="8" fill="#E30613"/>
+  <text x="60" y="60" text-anchor="middle" dominant-baseline="central"
+        font-family="'Arial Black', Arial, Helvetica, sans-serif" font-weight="900"
+        font-size="94" fill="#ffffff">S</text>
+  <circle cx="92" cy="30" r="8.5" fill="#ffffff"/>
+  <circle cx="28" cy="90" r="8.5" fill="#ffffff"/>
+</svg>

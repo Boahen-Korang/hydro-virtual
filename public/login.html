@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Oracle — Login / Register</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body {
+    background:
+      radial-gradient(900px 400px at 50% 0%, rgba(228,24,39,.05), transparent 60%),
+      var(--bg);
+  }
+  .auth-logo {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-bottom: 22px; font-weight: 800; font-size: 18px; letter-spacing: .05em;
+  }
+  .auth-logo .logo {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: conic-gradient(from 200deg,var(--green),var(--amber),var(--green));
+    display: grid; place-items: center;
+    box-shadow: 0 0 16px rgba(228,24,39,.25);
+  }
+  .step { display: none; }
+  .step.on { display: block; }
+  .auth-back {
+    display: inline-flex; align-items: center; gap: 5px;
+    color: var(--muted); font-size: 12px; text-decoration: none;
+    margin-bottom: 14px; transition: .12s;
+  }
+  .auth-back:hover { color: var(--chalk); }
+  .divider-or {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--muted); font-size: 12px; margin: 16px 0;
+  }
+  .divider-or::before, .divider-or::after {
+    content:""; flex:1; height:1px; background:var(--border);
+  }
+  .paystack-note {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--rs); padding: 10px 12px;
+    font-size: 12px; color: var(--muted); margin-top: 12px;
+  }
+  .paystack-note .pn-icon { font-size: 18px; flex: 0 0 auto; }
+  .plan-summary {
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: var(--rs); padding: 12px 14px; margin-bottom: 16px;
+  }
+  .plan-summary .ps-tier { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+  .plan-summary .ps-name { font-size: 15px; font-weight: 700; }
+  .plan-summary .ps-price { font-family: var(--mono); color: var(--amber); font-size: 13px; float: right; margin-top: -20px; }
+  .success-check { text-align: center; padding: 10px 0 20px; }
+  .success-check .check { font-size: 52px; animation: popIn .5s cubic-bezier(.2,.9,.3,1.4); }
+  @keyframes popIn { from{transform:scale(0)} to{transform:scale(1)} }
+  .success-check h3 { margin: 12px 0 6px; font-size: 20px; }
+  .success-check p { font-size: 13px; color: var(--muted); margin: 0; }
+  .error-msg {
+    background: rgba(255,92,92,.1); border: 1px solid rgba(255,92,92,.3);
+    border-radius: var(--rs); padding: 10px 12px;
+    font-size: 12px; color: var(--red); margin-bottom: 14px; display: none;
+  }
+  .pw-wrap { position: relative; }
+  .pw-toggle {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--muted); cursor: pointer;
+    font-size: 14px; padding: 4px;
+  }
+  .pw-toggle:hover { color: var(--chalk); }
+</style>
+</head>
+<body>
+
+<div class="auth-wrap">
+  <div class="auth-card card">
+    <div class="auth-body" id="auth-body">
+
+      <!-- STEP 0: Login / Register tabs -->
+      <div class="step on" id="step-auth">
+        <a href="index.html" class="auth-back">&larr; Back to home</a>
+        <div class="auth-logo">
+          <div class="logo">
+            <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+              <path d="M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm11 3h2v2h-2zm2-2h2v2h-2zm2 2h2v2h-2z" fill="#1A0509"/>
+            </svg>
+          </div>
+          Virtual Oracle
+        </div>
+
+        <div class="auth-tabs">
+          <div class="auth-tab on" id="tab-login" onclick="showTab('login')">Log in</div>
+          <div class="auth-tab" id="tab-register" onclick="showTab('register')">Register</div>
+        </div>
+
+        <!-- Login form -->
+        <div id="login-form" style="margin-top:20px">
+          <div class="error-msg" id="login-err"></div>
+          <div class="form-group">
+            <label class="form-label">Email address</label>
+            <input class="form-input" id="l-email" type="email" placeholder="you@example.com" autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="pw-wrap">
+              <input class="form-input" id="l-pw" type="password" placeholder="••••••••" autocomplete="current-password">
+              <button class="pw-toggle" onclick="togglePw('l-pw')">👁</button>
+            </div>
+          </div>
+          <p style="text-align:right;font-size:12px;margin:-6px 0 14px">
+            <a href="#" onclick="showForgot()">Forgot password?</a>
+          </p>
+          <button class="btn btn-primary btn-full" onclick="doLogin()">Log in</button>
+          <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px">
+            Don't have an account? <a href="#" onclick="showTab('register')">Register</a>
+          </p>
+        </div>
+
+        <!-- Forgot password: request a reset link -->
+        <div id="forgot-form" style="display:none;margin-top:20px">
+          <div class="error-msg" id="forgot-err"></div>
+          <div id="forgot-ask">
+            <p style="font-size:13px;color:var(--muted);margin:0 0 14px">Enter your account email and we'll send you a link to set a new password.</p>
+            <div class="form-group">
+              <label class="form-label">Email address</label>
+              <input class="form-input" id="f-email" type="email" placeholder="you@example.com" autocomplete="email">
+            </div>
+            <button class="btn btn-primary btn-full" id="forgot-btn" onclick="doForgot()">Send reset link</button>
+          </div>
+          <div id="forgot-sent" style="display:none">
+            <p style="font-size:14px;margin:0 0 6px">📬 Check your inbox</p>
+            <p style="font-size:13px;color:var(--muted);margin:0">If an account exists for that email, a reset link is on its way. It works for 30 minutes — check spam too.</p>
+          </div>
+          <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px">
+            <a href="#" onclick="showTab('login')">&larr; Back to log in</a>
+          </p>
+        </div>
+
+        <!-- Set a new password (arrived via the emailed link) -->
+        <div id="reset-form" style="display:none;margin-top:20px">
+          <div class="error-msg" id="reset-err"></div>
+          <p style="font-size:13px;color:var(--muted);margin:0 0 14px">Choose a new password for your account.</p>
+          <div class="form-group">
+            <label class="form-label">New password</label>
+            <div class="pw-wrap">
+              <input class="form-input" id="n-pw" type="password" placeholder="Min. 6 characters" autocomplete="new-password">
+              <button class="pw-toggle" onclick="togglePw('n-pw')">👁</button>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-full" id="reset-btn" onclick="doReset()">Set new password</button>
+        </div>
+
+        <!-- Register form -->
+        <div id="register-form" style="display:none;margin-top:20px">
+          <div class="error-msg" id="reg-err"></div>
+          <div class="form-group">
+            <label class="form-label">Full name</label>
+            <input class="form-input" id="r-name" type="text" placeholder="John Mensah" autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email address</label>
+            <input class="form-input" id="r-email" type="email" placeholder="you@example.com" autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="pw-wrap">
+              <input class="form-input" id="r-pw" type="password" placeholder="Min. 6 characters" autocomplete="new-password">
+              <button class="pw-toggle" onclick="togglePw('r-pw')">👁</button>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-full" id="reg-btn" onclick="goToPlans()">Create account →</button>
+          <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px">
+            Already have an account? <a href="#" onclick="showTab('login')">Log in</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- STEP: Connect SportyBet account (first-time only) -->
+      <div class="step" id="step-sporty">
+        <div id="sporty-form">
+          <h3 style="margin:0 0 4px;font-size:18px">Connect your SportyBet account</h3>
+          <p style="font-size:13px;color:var(--muted);margin:0 0 14px">Enter your SportyBet account number to link it to Virtual Oracle.</p>
+          <div style="text-align:center;margin:0 0 18px">
+            <img src="sporty-logo.svg" alt="SportyBet" width="72" height="72" style="border-radius:14px">
+          </div>
+          <div class="form-group">
+            <label class="form-label">SportyBet Account Number</label>
+            <div style="display:flex;gap:8px">
+              <select class="form-select" id="sporty-cc" style="flex:0 0 132px" onchange="updateSportyHint()">
+                <option value="+233">🇬🇭 +233</option>
+                <option value="+234">🇳🇬 +234</option>
+                <option value="+254">🇰🇪 +254</option>
+                <option value="+255">🇹🇿 +255</option>
+                <option value="+260">🇿🇲 +260</option>
+                <option value="+27">🇿🇦 +27</option>
+              </select>
+              <input class="form-input" id="sporty-num" type="tel" inputmode="numeric" placeholder="244 123 456" autocomplete="off" style="flex:1;min-width:0">
+            </div>
+          </div>
+          <div id="sporty-err" style="display:none;color:var(--red);font-size:13px;margin-bottom:12px"></div>
+          <button class="btn btn-primary btn-full" id="sporty-btn" onclick="connectSporty()">Connect account →</button>
+        </div>
+
+        <div id="sporty-loading" style="display:none;text-align:center;padding:34px 0">
+          <div class="logo-spin" style="margin:0 auto 18px">
+            <img src="sporty-logo.svg" alt="SportyBet">
+          </div>
+          <div style="font-size:14px;color:var(--muted)">Connecting your SportyBet account…</div>
+        </div>
+
+        <div id="sporty-done" style="display:none">
+          <div class="success-check">
+            <div class="check">✅</div>
+            <h3>Sporty account connected successfully</h3>
+            <p>Your SportyBet account has been connected. A confirmation email is on its way.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP: Success -->
+      <div class="step" id="step-done">
+        <div class="success-check">
+          <div class="check">✅</div>
+          <h3>You're in!</h3>
+          <p>Payment confirmed. Welcome to Virtual Oracle.</p>
+        </div>
+        <a href="dashboard.html" class="btn btn-primary btn-full btn-lg">Go to dashboard →</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Paystack inline JS -->
+<script src="gateways.js"></script>
+<script src="api.js"></script>
+<script>
+/* ================================================================
+   Virtual Oracle Auth + Payment — now backed by the API (window.VE).
+   The Paystack public key is loaded from the server config.
+   ================================================================ */
+let PAYSTACK_PUBLIC_KEY = 'pk_test_REPLACE_WITH_YOUR_PAYSTACK_PUBLIC_KEY';
+let PAY_CURRENCY = 'GHS';
+let PAY_BUSINESS = 'Virtual Oracle';
+let PAY_PROVIDER = 'paystack';
+
+let pendingUser = {};    // Holds registration data before payment
+let selectedPlan = {};   // Holds chosen plan
+
+/* ---- Toast ---- */
+let toastT;
+function toast(msg, type=''){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast' + (type ? ' '+type : '');
+  void el.offsetWidth; el.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(()=>el.classList.remove('show'), 2800);
+}
+
+/* ---- Tab switch ---- */
+function showTab(which){
+  document.getElementById('tab-login').classList.toggle('on', which==='login');
+  document.getElementById('tab-register').classList.toggle('on', which==='register');
+  document.getElementById('login-form').style.display    = which==='login'    ? '' : 'none';
+  document.getElementById('register-form').style.display = which==='register' ? '' : 'none';
+  document.getElementById('forgot-form').style.display = 'none';
+  document.getElementById('reset-form').style.display = 'none';
+}
+
+/* ---- Forgot / reset password ---- */
+let RESET_TOKEN = '';
+function showForgot(){
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('register-form').style.display = 'none';
+  document.getElementById('forgot-form').style.display = '';
+  document.getElementById('forgot-ask').style.display = '';
+  document.getElementById('forgot-sent').style.display = 'none';
+  document.getElementById('forgot-err').style.display = 'none';
+  document.getElementById('f-email').value = document.getElementById('l-email').value.trim();
+}
+async function doForgot(){
+  const email = document.getElementById('f-email').value.trim();
+  const errEl = document.getElementById('forgot-err');
+  const btn = document.getElementById('forgot-btn');
+  errEl.style.display = 'none';
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    errEl.textContent = 'Please enter a valid email.'; errEl.style.display=''; return;
+  }
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await VE.forgotPassword(email);
+    document.getElementById('forgot-ask').style.display = 'none';
+    document.getElementById('forgot-sent').style.display = '';
+  } catch(e){
+    errEl.textContent = e.message || 'Could not send the reset email. Try again.'; errEl.style.display='';
+  }
+  btn.disabled = false; btn.textContent = 'Send reset link';
+}
+async function doReset(){
+  const pw = document.getElementById('n-pw').value;
+  const errEl = document.getElementById('reset-err');
+  const btn = document.getElementById('reset-btn');
+  errEl.style.display = 'none';
+  if(pw.length < 6){
+    errEl.textContent = 'Password must be at least 6 characters.'; errEl.style.display=''; return;
+  }
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await VE.resetPassword(RESET_TOKEN, pw);
+    history.replaceState(null, '', 'login.html');   // drop the used token from the URL
+    showTab('login');
+    const errL = document.getElementById('login-err');
+    errL.textContent = '✓ Password updated — log in with your new password.';
+    errL.style.display = '';
+  } catch(e){
+    errEl.textContent = e.message || 'Could not reset the password.'; errEl.style.display='';
+  }
+  btn.disabled = false; btn.textContent = 'Set new password';
+}
+/* Arriving from the emailed link (?reset=TOKEN) goes straight to the new-password form */
+(function(){
+  const t = new URLSearchParams(location.search).get('reset');
+  if(!t) return;
+  RESET_TOKEN = t;
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('register-form').style.display = 'none';
+  document.getElementById('reset-form').style.display = '';
+})();
+
+/* ---- Password toggle ---- */
+function togglePw(id){
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+/* ---- Step navigation ---- */
+function showStep(id){
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+function goBack(id){ showStep(id); }
+
+/* ---- Login ---- */
+async function doLogin(){
+  const email = document.getElementById('l-email').value.trim();
+  const pw    = document.getElementById('l-pw').value;
+  const errEl = document.getElementById('login-err');
+  errEl.style.display = 'none';
+
+  if(!email || !pw){
+    errEl.textContent = 'Please fill in all fields.'; errEl.style.display=''; return;
+  }
+
+  try {
+    await VE.login(email, pw);
+    let me = null;
+    try { me = await VE.me(); } catch(e){}
+    const u = (me && me.user) || {};
+    // Signup gates first: registration fee, then a linked SportyBet account
+    if(me && u.regFeePaid === false){ window.location.href = 'pricing.html'; return; }
+    if(me && !u.sportyAccount){ showStep('step-sporty'); updateSportyHint(); return; }
+    // Then: predictions left → dashboard, otherwise the packages page
+    const credits = (me && me.credits) || 0;
+    const unlimited = !!(u.unlimitedUntil && Date.now() < u.unlimitedUntil);
+    window.location.href = (credits > 0 || unlimited) ? 'dashboard.html' : 'pricing.html';
+  } catch(e){
+    errEl.textContent = e.message || 'Incorrect email or password.'; errEl.style.display='';
+  }
+}
+
+/* ---- Register: create the account, then go straight to the packages page ---- */
+async function goToPlans(){
+  const name  = document.getElementById('r-name').value.trim();
+  const email = document.getElementById('r-email').value.trim();
+  const pw    = document.getElementById('r-pw').value;
+  const errEl = document.getElementById('reg-err');
+  const btn   = document.getElementById('reg-btn');
+  errEl.style.display = 'none';
+
+  if(!name || !email || !pw){
+    errEl.textContent = 'Please fill in all fields.'; errEl.style.display=''; return;
+  }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    errEl.textContent = 'Please enter a valid email.'; errEl.style.display=''; return;
+  }
+  if(pw.length < 6){
+    errEl.textContent = 'Password must be at least 6 characters.'; errEl.style.display=''; return;
+  }
+
+  btn.disabled = true; btn.textContent = 'Creating account…';
+  try {
+    const refCode = localStorage.getItem('ve_ref') || '';
+    await VE.register(name, email, pw, refCode);
+    localStorage.removeItem('ve_ref');
+    // New accounts pay the one-time registration fee first; the pricing page
+    // sends them back here (#sporty) to connect their SportyBet account after.
+    window.location.href = 'pricing.html';
+  } catch(e){
+    btn.disabled = false; btn.textContent = 'Create account →';
+    errEl.textContent = e.message || 'Could not create account.'; errEl.style.display='';
+  }
+}
+
+/* ---- Connect SportyBet account (first-time signup) ---- */
+/* Strict local-number length per country (digits as typed, incl. leading 0) */
+const CC_RULES = {
+  '+233': { len: 10, name: 'Ghana',        ph: '0244123456'  },
+  '+234': { len: 11, name: 'Nigeria',      ph: '08031234567' },
+  '+254': { len: 10, name: 'Kenya',        ph: '0712345678'  },
+  '+255': { len: 10, name: 'Tanzania',     ph: '0712345678'  },
+  '+260': { len: 10, name: 'Zambia',       ph: '0977123456'  },
+  '+27':  { len: 10, name: 'South Africa', ph: '0821234567'  },
+};
+function updateSportyHint(){
+  const cc = document.getElementById('sporty-cc').value;
+  const rule = CC_RULES[cc] || { len: 10, ph: '' };
+  const inp = document.getElementById('sporty-num');
+  inp.maxLength = rule.len;
+  inp.placeholder = rule.ph || '';
+  inp.value = inp.value.replace(/\D/g, '').slice(0, rule.len);  // keep digits within the new limit
+}
+async function connectSporty(){
+  const cc     = document.getElementById('sporty-cc').value;
+  const rule   = CC_RULES[cc] || { len: 10, name: 'your country' };
+  const digits = document.getElementById('sporty-num').value.replace(/\D/g, '');
+  const errEl  = document.getElementById('sporty-err');
+  errEl.style.display = 'none';
+  if(!digits){ errEl.textContent = 'Please enter your SportyBet account number.'; errEl.style.display=''; return; }
+  if(digits.length !== rule.len){
+    errEl.textContent = `${rule.name} numbers must be exactly ${rule.len} digits.`;
+    errEl.style.display = '';
+    return;
+  }
+  const account = cc + digits.replace(/^0/, '');   // international, e.g. +233244123456
+
+  // show the loading screen
+  document.getElementById('sporty-form').style.display = 'none';
+  document.getElementById('sporty-loading').style.display = '';
+  try {
+    await VE.connectSporty(account);
+    setTimeout(() => {
+      document.getElementById('sporty-loading').style.display = 'none';
+      document.getElementById('sporty-done').style.display = '';
+      toast('Sporty account connected successfully', 'success');
+      setTimeout(() => { window.location.href = 'pricing.html'; }, 2000);
+    }, 1200);
+  } catch(e){
+    if(e && e.status === 402){ window.location.href = 'pricing.html'; return; }   // fee not paid
+    document.getElementById('sporty-loading').style.display = 'none';
+    document.getElementById('sporty-form').style.display = '';
+    errEl.textContent = e.message || 'Could not connect your account. Try again.'; errEl.style.display='';
+  }
+}
+
+/* ---- Plan selection ---- */
+function selectPlan(el){
+  document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedPlan = {
+    plan:  el.dataset.plan,
+    price: +el.dataset.price,
+    label: el.dataset.label
+  };
+}
+
+/* ---- Move to payment step ---- */
+function goToPayment(){
+  if(!selectedPlan.plan){ toast('Please select a plan.'); return; }
+  const s = document.getElementById('pay-summary');
+  s.innerHTML = `
+    <div class="ps-tier">Your plan</div>
+    <div class="ps-name">${selectedPlan.label} <span class="ps-price">GHS ${selectedPlan.price} / week</span></div>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px">
+      Expires: ${new Date(Date.now() + 7*24*60*60*1000).toLocaleDateString('en-GH',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}
+    </div>`;
+  showStep('step-pay');
+}
+
+/* ---- Paystack payment ---- */
+function startPayment(){
+  const btn = document.getElementById('pay-btn');
+  btn.disabled = true; btn.textContent = 'Opening payment…';
+
+  const ref = 'VE_' + Date.now() + '_' + Math.random().toString(36).slice(2,7).toUpperCase();
+
+  // No real gateway key loaded → fail safe, never simulate a payment.
+  if(PAY_PROVIDER !== 'manual' && PAYSTACK_PUBLIC_KEY.includes('REPLACE')){
+    btn.disabled = false; btn.textContent = 'Pay with Paystack →';
+    toast('Payment is temporarily unavailable. Please refresh and try again.', 'error');
+    return;
+  }
+
+  const reset = () => { btn.disabled = false; btn.textContent = 'Pay with Paystack →'; };
+  VEPay.checkout(
+    PAY_PROVIDER,
+    { key: PAYSTACK_PUBLIC_KEY, business: PAY_BUSINESS },
+    {
+      email: pendingUser.email,
+      name: pendingUser.name,
+      amount: selectedPlan.price,
+      currency: PAY_CURRENCY,
+      reference: ref,
+      metadata: {
+        name: pendingUser.name,
+        plan: selectedPlan.plan,
+        custom_fields: [
+          { display_name: 'Plan', variable_name: 'plan', value: selectedPlan.label }
+        ]
+      },
+    },
+    {
+      onSuccess: (reference) => onPaymentSuccess(reference || ref),
+      onCancel: () => { reset(); toast('Payment cancelled.'); },
+      onError: (msg) => { reset(); toast(msg || 'Payment error. Please try again.', 'error'); },
+    }
+  );
+}
+
+async function onPaymentSuccess(ref){
+  const planEnd = Date.now() + 7 * 24 * 60 * 60 * 1000;
+  const refCode = localStorage.getItem('ve_ref') || '';
+  try {
+    // create the account (also signs us in via JWT)
+    await VE.register(pendingUser.name, pendingUser.email, pendingUser.pw, refCode);
+    // record the purchase + activate the plan
+    await VE.recordPurchase({
+      pkg: 'GHS ' + selectedPlan.price,
+      reference: ref,
+      predictions: 0,
+      plan: selectedPlan.plan,
+      planEnd
+    });
+    localStorage.removeItem('ve_ref');
+    showStep('step-done');
+  } catch(e){
+    toast(e.message || 'Could not complete sign-up.', 'error');
+  }
+}
+
+/* ---- Init ---- */
+(async function init(){
+  // Load the Paystack public key from the server payment config
+  try{
+    const cfg = await VE.paymentConfigPublic();
+    if(cfg){
+      if(cfg.key) PAYSTACK_PUBLIC_KEY = cfg.key;
+      if(cfg.currency) PAY_CURRENCY = cfg.currency;
+      if(cfg.business) PAY_BUSINESS = cfg.business;
+      PAY_PROVIDER = (cfg.provider && window.VEPay && VEPay.has(cfg.provider))
+        ? cfg.provider
+        : ((window.VEPay && VEPay.providerForKey(PAYSTACK_PUBLIC_KEY)) || 'paystack');
+    }
+  }catch(e){}
+
+  // Capture partner referral code (?ref=CODE) if a partner link landed here
+  try{
+    const ref = new URLSearchParams(location.search).get('ref');
+    if(ref) localStorage.setItem('ve_ref', ref.toUpperCase().replace(/[^A-Z0-9]/g,''));
+  }catch(e){}
+
+  // Check for #register hash
+  if(location.hash === '#register') showTab('register');
+
+  // Back from the registration-fee payment → straight to the SportyBet step.
+  // Verify the fee server-side first — arriving here unpaid gets sent back.
+  if(location.hash === '#sporty' && VE.isMember()){
+    (async () => {
+      let me = null;
+      try { me = await VE.me(); } catch(e){}
+      if(me && me.user && me.user.regFeePaid === false){ window.location.href = 'pricing.html'; return; }
+      showStep('step-sporty');
+      updateSportyHint();
+    })();
+  }
+
+  // Carry over the email typed on the landing page (if any)
+  const prefill = localStorage.getItem('ve_prefill_email');
+  if(prefill){
+    const re = document.getElementById('r-email');
+    const le = document.getElementById('l-email');
+    if(re && !re.value) re.value = prefill;
+    if(le && !le.value) le.value = prefill;
+    localStorage.removeItem('ve_prefill_email');
+  }
+})();
+</script>
+</body>
+</html>

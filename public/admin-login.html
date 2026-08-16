@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Oracle — Admin Login</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Oswald:wght@400;500;600&family=Spectral:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --crimson:#E51D2A; --blood:#E51D2A;
+    --green:#22C55E; --green-hi:#2BBE5C; --green-bd:#3BBF70;
+    --ink:#FFFFFF; --gray:#A0A5B8; --gray-dim:#6B7080;
+    --line:#2E323F; --bg:#0C0D12;
+    --display:'Cinzel',Georgia,serif; --body:'Spectral',Georgia,serif; --ui:'Oswald','Arial Narrow',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    min-height:100vh;font-family:var(--body);color:var(--ink);background:var(--bg);
+    display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;
+  }
+  /* SportyBet-style red header */
+  .top{
+    background:var(--crimson);color:#fff;padding:15px 22px;
+    display:flex;align-items:center;gap:10px;box-shadow:0 2px 12px rgba(25,30,45,.15);
+  }
+  .top .di{font-size:13px}
+  .top .brand{font-family:var(--display);font-weight:900;font-size:17px;letter-spacing:.1em}
+  .top a{margin-left:auto;color:rgba(255,255,255,.85);font-family:var(--ui);font-size:11px;
+    letter-spacing:.12em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,.45);
+    border-radius:3px;padding:7px 12px;transition:.15s}
+  .top a:hover{color:#fff;border-color:#fff;background:rgba(255,255,255,.12)}
+
+  .wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:26px 16px}
+  .card{
+    width:100%;max-width:380px;background:#171922;border:1px solid var(--line);border-radius:10px;
+    padding:34px 28px;text-align:center;box-shadow:0 22px 60px -24px rgba(0,0,0,.55);
+  }
+  .lock-ic{
+    width:54px;height:54px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;
+    background:rgba(228,24,39,.08);border:1.5px solid rgba(228,24,39,.3);color:var(--crimson);font-size:22px;
+  }
+  h1{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:.04em;margin-bottom:6px}
+  .sub{font-size:13.5px;color:var(--gray);margin-bottom:22px}
+  .err{
+    display:none;background:rgba(228,24,39,.07);border:1px solid rgba(228,24,39,.3);border-radius:6px;
+    color:var(--blood);font-size:12.5px;padding:10px 12px;margin-bottom:14px;
+  }
+  .err.show{display:block}
+  .pw-wrap{position:relative;margin-bottom:16px}
+  input{
+    width:100%;background:#FAFBFC;border:1.5px solid var(--line);border-radius:6px;
+    color:var(--ink);font-family:var(--body);font-size:16px;padding:13px 44px 13px 14px;
+    text-align:center;letter-spacing:.25em;outline:none;transition:.15s;
+  }
+  input:focus{border-color:var(--crimson);box-shadow:0 0 0 3px rgba(228,24,39,.12);background:#fff}
+  .pw-toggle{
+    position:absolute;right:10px;top:50%;transform:translateY(-50%);
+    background:none;border:none;color:var(--gray-dim);cursor:pointer;font-size:15px;padding:4px;
+  }
+  .pw-toggle:hover{color:var(--ink)}
+  button.go{
+    width:100%;background:linear-gradient(180deg,var(--green-hi),var(--green));color:#fff;
+    border:1px solid var(--green-bd);border-radius:6px;font-family:var(--ui);text-transform:uppercase;
+    letter-spacing:.16em;font-size:13px;font-weight:600;padding:14px;cursor:pointer;transition:.16s;
+    box-shadow:0 8px 24px rgba(31,158,72,.35);
+  }
+  button.go:hover{filter:brightness(1.07)}
+  button.go:disabled{opacity:.55;pointer-events:none}
+  .foot{padding:16px;text-align:center;font-family:var(--ui);font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--gray-dim)}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <span class="di">◆</span><span class="brand">VIRTUAL ORACLE</span>
+  <a href="index.html">← Back to site</a>
+</div>
+
+<div class="wrap">
+  <div class="card">
+    <div class="lock-ic">🔒</div>
+    <h1>Admin Access</h1>
+    <p class="sub">Sign in with your admin email and password.</p>
+    <div class="err" id="err"></div>
+    <input type="email" id="email" placeholder="admin@gmail.com" autocomplete="username"
+           style="margin-bottom:12px;text-align:left;letter-spacing:normal"
+           onkeydown="if(event.key==='Enter')doUnlock()">
+    <div class="pw-wrap">
+      <input type="password" id="pass" placeholder="Password" autocomplete="current-password"
+             style="text-align:left;letter-spacing:normal"
+             onkeydown="if(event.key==='Enter')doUnlock()">
+      <button class="pw-toggle" type="button" onclick="togglePw()">👁</button>
+    </div>
+    <button class="go" id="go" onclick="doUnlock()">Sign in</button>
+  </div>
+</div>
+
+<div class="foot">Virtual Oracle · Restricted area</div>
+
+<script src="api.js"></script>
+<script>
+"use strict";
+const err = document.getElementById('err');
+
+/* Already signed in → straight to the dashboard (it bounces back here if the
+   token has expired). ?expired=1 explains why the dashboard sent us back. */
+(function init(){
+  const q = new URLSearchParams(location.search);
+  if(q.get('expired')){
+    err.textContent = 'Session expired — enter the passcode again.';
+    err.classList.add('show');
+  } else if(VE.isAdmin()){
+    location.replace('admin.html');
+    return;
+  }
+  document.getElementById('email').focus();
+})();
+
+function togglePw(){
+  const el = document.getElementById('pass');
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+async function doUnlock(){
+  const email = document.getElementById('email').value.trim();
+  const pass = document.getElementById('pass').value;
+  const btn = document.getElementById('go');
+  err.classList.remove('show');
+  if(!email || !pass){ err.textContent = 'Enter your email and password.'; err.classList.add('show'); return; }
+  btn.disabled = true; btn.textContent = 'Checking…';
+  try {
+    await VE.adminLogin(email, pass);
+    location.replace('admin.html');
+  } catch(e){
+    err.textContent = e.message || 'Wrong email or password.';
+    err.classList.add('show');
+    document.getElementById('pass').value = '';
+    document.getElementById('pass').focus();
+    btn.disabled = false; btn.textContent = 'Sign in';
+  }
+}
+</script>
+</body>
+</html>
