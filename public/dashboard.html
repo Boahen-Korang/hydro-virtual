@@ -99,16 +99,16 @@
   /* ---- Screenshot preview ---- */
   .preview-section { display: none; margin-top: 14px; }
   .preview-box {
-    border: 1px solid #D0D5DC; border-radius: 14px; overflow: hidden;
+    border: 1px solid rgba(229,29,42,.3); border-radius: 14px; overflow: hidden;
     position: relative;
   }
   .preview-box img {
     width: 100%; display: block; max-height: 340px;
-    object-fit: contain; background: #F3F5F8;
+    object-fit: contain; background: #14151A;
   }
   .preview-box .remove-btn {
     position: absolute; top: 10px; right: 10px;
-    background: rgba(243,245,248,.85); border: 1px solid #D0D5DC;
+    background: rgba(12,13,18,.85); border: 1px solid rgba(229,29,42,.3);
     border-radius: 8px; color: var(--muted); font-size: 12px;
     padding: 5px 10px; cursor: pointer; backdrop-filter: blur(4px);
   }
@@ -128,7 +128,7 @@
   .loading-screen {
     display: none;
     position: fixed; inset: 0; z-index: 50;
-    background: #F3F5F8;
+    background: #14151A;
     flex-direction: column; align-items: center; justify-content: center;
     gap: 0; padding: 30px;
   }
@@ -314,7 +314,7 @@
     text-transform: uppercase; color: var(--muted); margin-bottom: 5px;
   }
   .ti-input {
-    width: 100%; background: #F3F5F8; border: 1px solid #D0D5DC;
+    width: 100%; background: #14151A; border: 1px solid rgba(229,29,42,.3);
     border-radius: 10px; color: var(--chalk);
     font-family: var(--sans); font-size: 13px; font-weight: 600;
     padding: 10px 11px; outline: none; transition: .12s;
@@ -1278,14 +1278,14 @@ function rbPredict(){
       <div class="rb-pick">${picks[0].pick === 'red' ? '🔴 RED' : '⚫ BLACK'}</div>
     </div>
     ${picks.slice(1).map((p, i) => `
-      <div style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #E2E5EA;border-radius:12px;padding:12px 14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px;background:#171922;border:1px solid rgba(229,29,42,.25);border-radius:12px;padding:12px 14px;margin-bottom:10px">
         <div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--muted);width:56px">${i === 0 ? 'THEN' : '3RD'}</div>
         <div style="width:30px;height:40px;border-radius:6px;background:${p.pick === 'red' ? '#E41827' : '#1A1C22'};color:#fff;display:grid;place-items:center;font-weight:800">${p.pick === 'red' ? 'R' : 'B'}</div>
         <div style="flex:1">
           <div style="font-weight:800;color:var(--chalk)">${p.pick === 'red' ? 'RED' : 'BLACK'}</div>
         </div>
       </div>`).join('')}
-    <div class="stat-pill" style="display:flex;justify-content:space-around;padding:12px;border:1px solid #E2E5EA;border-radius:12px;background:#fff;margin-bottom:14px">
+    <div class="stat-pill" style="display:flex;justify-content:space-around;padding:12px;border:1px solid rgba(229,29,42,.25);border-radius:12px;background:#171922;margin-bottom:14px">
       <span style="font-size:13px;color:var(--muted)">🔴 Reds <b style="color:var(--chalk)">${reds}</b></span>
       <span style="font-size:13px;color:var(--muted)">⚫ Blacks <b style="color:var(--chalk)">${blacks}</b></span>
       <span style="font-size:13px;color:var(--muted)">🃏 Jokers <b style="color:var(--chalk)">${jokers}</b></span>
