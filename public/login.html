@@ -2,6 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>/* pre-paint view routing: prevent the login form flashing before the
+   bottom-of-page script switches to the step the hash asks for */
+if(location.hash==='#sporty' && localStorage.getItem('ve_tok')) document.documentElement.classList.add('goto-sporty');
+if(location.hash==='#register') document.documentElement.classList.add('goto-register');</script>
+<style>
+  .goto-sporty #step-auth{display:none !important}
+  .goto-register #login-form{display:none !important}
+</style>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VirtualPrime — Login / Register</title>
 <link rel="stylesheet" href="style.css">
@@ -283,6 +291,7 @@ function toast(msg, type=''){
 
 /* ---- Tab switch ---- */
 function showTab(which){
+  document.documentElement.classList.remove('goto-register','goto-sporty');
   document.getElementById('tab-login').classList.toggle('on', which==='login');
   document.getElementById('tab-register').classList.toggle('on', which==='register');
   document.getElementById('login-form').style.display    = which==='login'    ? '' : 'none';
@@ -563,6 +572,29 @@ async function onPaymentSuccess(ref){
 
 /* ---- Init ---- */
 (async function init(){
+  // Hash-based view routing FIRST — synchronous, before any network call,
+  // so the correct step shows immediately with no login-form flash.
+  if(location.hash === '#register') showTab('register');
+
+  // Back from the registration-fee payment → straight to the SportyBet step.
+  // Verify the fee server-side in the background — arriving unpaid gets sent back.
+  if(location.hash === '#sporty' && VE.isMember()){
+    showStep('step-sporty');
+    document.documentElement.classList.remove('goto-sporty');
+    updateSportyHint();
+    (async () => {
+      let me = null;
+      try { me = await VE.me(); } catch(e){}
+      if(me && me.user && me.user.regFeePaid === false){ window.location.replace('pricing.html'); return; }
+    })();
+  }
+
+  // Capture partner referral code (?ref=CODE) if a partner link landed here
+  try{
+    const ref = new URLSearchParams(location.search).get('ref');
+    if(ref) localStorage.setItem('ve_ref', ref.toUpperCase().replace(/[^A-Z0-9]/g,''));
+  }catch(e){}
+
   // Load the Paystack public key from the server payment config
   try{
     const cfg = await VE.paymentConfigPublic();
@@ -575,27 +607,6 @@ async function onPaymentSuccess(ref){
         : ((window.VEPay && VEPay.providerForKey(PAYSTACK_PUBLIC_KEY)) || 'paystack');
     }
   }catch(e){}
-
-  // Capture partner referral code (?ref=CODE) if a partner link landed here
-  try{
-    const ref = new URLSearchParams(location.search).get('ref');
-    if(ref) localStorage.setItem('ve_ref', ref.toUpperCase().replace(/[^A-Z0-9]/g,''));
-  }catch(e){}
-
-  // Check for #register hash
-  if(location.hash === '#register') showTab('register');
-
-  // Back from the registration-fee payment → straight to the SportyBet step.
-  // Verify the fee server-side first — arriving here unpaid gets sent back.
-  if(location.hash === '#sporty' && VE.isMember()){
-    (async () => {
-      let me = null;
-      try { me = await VE.me(); } catch(e){}
-      if(me && me.user && me.user.regFeePaid === false){ window.location.replace('pricing.html'); return; }
-      showStep('step-sporty');
-      updateSportyHint();
-    })();
-  }
 
   // Carry over the email typed on the landing page (if any)
   const prefill = localStorage.getItem('ve_prefill_email');
