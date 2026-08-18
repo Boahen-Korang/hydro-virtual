@@ -81,6 +81,7 @@
     },
     partnerMe: () => req('GET', '/partner/me', null, 'partner'),
     partnerReferrals: () => req('GET', '/partner/referrals', null, 'partner'),
+    partnerRevenueDaily: () => req('GET', '/partner/revenue-daily', null, 'partner'),
     partnerClearRevenue: () => req('POST', '/partner/revenue-clear', {}, 'partner'),
     partnerPicks: () => req('GET', '/partner/picks', null, 'partner'),
     partnerSendPicks: (email, picks) => req('POST', '/partner/picks', { email, picks }, 'partner'),

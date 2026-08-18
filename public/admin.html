@@ -1965,6 +1965,13 @@ function toast(msg, type=''){
 (function init(){
   if(!VE.isAdmin()){ location.replace('admin-login.html'); return; }
   loadAll();
+  /* Live revenue: refresh the daily feed + stat tiles every 60s */
+  setInterval(async () => {
+    try {
+      _daily = await VE.adminRevenueDaily();
+      renderStats();
+    } catch(e){}
+  }, 60000);
 })();
 </script>
 </body>

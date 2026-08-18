@@ -258,6 +258,15 @@
       </div>
 
       <div class="stats" id="stats"></div>
+
+      <!-- Live revenue: today + last 7 days -->
+      <div class="panel" style="margin-top:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px 4px">
+          <div style="font-family:var(--ui);text-transform:uppercase;letter-spacing:.16em;font-size:11px;color:var(--ash-dim)">Revenue — last 7 days</div>
+          <div style="font-family:var(--ui);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--crimson)">● live</div>
+        </div>
+        <div id="p-daily-rev" style="padding:8px 18px 16px"></div>
+      </div>
     </section>
 
     <!-- ===== Send a prediction ===== -->
@@ -397,9 +406,16 @@ async function render(){
   const rate     = (CURRENT && CURRENT.commission != null) ? Number(CURRENT.commission) : 10;
   const earnings = revenue * rate / 100;
 
+  /* Live daily revenue (today + last 7 days) */
+  let daily = [];
+  try { daily = await VE.partnerRevenueDaily(); } catch(e){ daily = []; }
+  const today = (daily && daily.length) ? daily[daily.length - 1] : { revenue: 0, count: 0 };
+  renderDailyRevP(daily);
+
   /* Stat cards */
   const cards = [
     { label:'Referred Members', val: total,  ico:'☷', cls:'',     sub: active+' currently active' },
+    { label:'Revenue Today',    val: fmtMoney(today.revenue), ico:'📊', cls:'', sub: today.count+' transaction'+(today.count===1?'':'s')+' today' },
     { label:'Revenue Brought In',val: fmtMoney(revenue), ico:'₵', cls:'', sub:'from your referrals' },
     { label:'Your Earnings',    val: fmtMoney(earnings), ico:'★', cls:'gold', icoCls:'gold', sub: rate + '% commission on referred revenue' },
   ];
@@ -743,6 +759,30 @@ async function clearRevenueP(){
   } catch(e){ toast(e.message || 'Could not clear revenue.'); }
 }
 
+/* ---- Daily revenue bars (today + past 7 days, red theme) ---- */
+function renderDailyRevP(days){
+  const el = document.getElementById('p-daily-rev');
+  if(!el) return;
+  days = days || [];
+  if(!days.length){ el.innerHTML = '<div class="empty">No revenue data yet.</div>'; return; }
+  const max = Math.max(1, ...days.map(d => d.revenue));
+  const names = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  el.innerHTML = days.map((d, i) => {
+    const dt = new Date(d.day + 'T00:00:00Z');
+    const isToday = i === days.length - 1;
+    const label = isToday ? 'Today' : names[dt.getUTCDay()] + ' ' + dt.getUTCDate();
+    const w = Math.max(d.revenue > 0 ? 2 : 0, Math.round(d.revenue / max * 100));
+    return `<div style="display:flex;align-items:center;gap:12px;padding:7px 0">
+      <div style="width:66px;flex:0 0 auto;font-family:var(--ui);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:${isToday ? '600' : '400'};color:${isToday ? 'var(--crimson)' : 'var(--ash)'}">${label}</div>
+      <div style="flex:1;height:14px;background:rgba(12,13,18,.6);border:1px solid rgba(229,29,42,.15);border-radius:4px;overflow:hidden">
+        <div style="width:${w}%;height:100%;background:linear-gradient(90deg,var(--crimson),#FF3B47);border-radius:0 4px 4px 0"></div>
+      </div>
+      <div style="width:130px;flex:0 0 auto;text-align:right;font-size:13px;font-weight:700;color:var(--bone)">${esc(fmtMoney(d.revenue))}
+        <span style="color:var(--ash-dim);font-weight:400;font-size:11px">· ${d.count} tx</span></div>
+    </div>`;
+  }).join('');
+}
+
 /* Init — require an approved partner session, else go to login */
 (async function init(){
   if(!VE.isPartner()){ window.location.href = 'partner-login.html'; return; }
@@ -755,6 +795,8 @@ async function clearRevenueP(){
     return;
   }
   render();
+  /* Live revenue: refresh the stats + 7-day panel every 60s */
+  setInterval(() => { Promise.resolve(render()).catch(() => {}); }, 60000);
 })();
 </script>
 </body>

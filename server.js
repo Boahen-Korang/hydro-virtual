@@ -606,6 +606,27 @@ app.get('/api/partner/referrals', auth('partner'), wrap(async (req, res) => {
   res.json(u.rows.map((r) => ({ ...userOut(r), spend: spend[r.email] || 0 })));
 }));
 
+/* Factual per-day takings from this partner's referred members, last 7 days
+   (today included). Like the admin report, this deliberately ignores the
+   clear-revenue marker — it shows what actually came in each day. */
+app.get('/api/partner/revenue-daily', auth('partner'), wrap(async (req, res) => {
+  const { rows } = await query(
+    "SELECT pkg, created_at FROM purchases WHERE created_at > now() - interval '7 days' AND email IN (SELECT email FROM users WHERE partner=$1)",
+    [req.user.code]);
+  const byDay = {};
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const key = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+    days.push(key);
+    byDay[key] = { day: key, revenue: 0, count: 0 };
+  }
+  rows.forEach((r) => {
+    const key = new Date(r.created_at).toISOString().slice(0, 10);
+    if (byDay[key]) { byDay[key].revenue += parsePrice(r.pkg); byDay[key].count++; }
+  });
+  res.json(days.map((k) => byDay[k]));
+}));
+
 // reset the partner's own revenue/earnings display to zero (data is kept)
 app.post('/api/partner/revenue-clear', auth('partner'), wrap(async (req, res) => {
   await query('UPDATE partners SET revenue_cleared_at=now() WHERE code=$1', [req.user.code]);
