@@ -105,6 +105,7 @@
     adminPartnerAction: (id, action, extra) => req('PATCH', '/admin/partners/' + id, Object.assign({ action }, extra || {}), 'admin'),
     adminDeletePartner: (id) => req('DELETE', '/admin/partners/' + id, null, 'admin'),
     adminGrantCredits: (email, amount, game) => req('POST', '/admin/credits', { email, amount, game }, 'admin'),
+    adminSetUserPartner: (email, partner) => req('PATCH', '/admin/users/' + encodeURIComponent(email) + '/partner', { partner }, 'admin'),
     adminScanUsage: () => req('GET', '/admin/scan-usage', null, 'admin'),
     adminScanTopup: (amount) => req('POST', '/admin/scan-topup', { amount }, 'admin'),
     adminDeleteUser: (email) => req('DELETE', '/admin/users/' + encodeURIComponent(email), null, 'admin'),

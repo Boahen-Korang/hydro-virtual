@@ -1131,6 +1131,7 @@ function renderUsers(){
           : `<span class="ref">— direct</span>`}</td>
         <td><div class="row-actions">
           <button class="act" onclick="grantCredits('${esc(r.email)}')">+ Credits</button>
+          <button class="act" title="Credit this member's signup to a partner (or clear it)" onclick="assignPartner('${esc(r.email)}')">⇄ Partner</button>
           <button class="act danger" onclick="deleteUser('${esc(r.email)}')">Delete</button>
         </div></td>
       </tr>`;
@@ -1607,6 +1608,16 @@ async function deleteUser(email){
   if(!confirm('Delete member ' + email + '?\nThis removes their account and credits (transaction history is kept).')) return;
   try { await VE.adminDeleteUser(email); toast('Deleted ' + email); await loadAll(); }
   catch(e){ toast(e.message || 'Could not delete.', 'error'); }
+}
+async function assignPartner(email){
+  const codes = getPartners().filter(p => (p.status||'approved')==='approved').map(p => p.code + ' — ' + (p.name||''));
+  const raw = prompt('Credit ' + email + ' to which partner?\n\nPartner codes:\n' + (codes.join('\n') || '(no approved partners)') + '\n\nEnter a code, or leave empty to make this member direct.');
+  if(raw == null) return;
+  try {
+    await VE.adminSetUserPartner(email, raw.trim());
+    toast(raw.trim() ? (email + ' credited to ' + raw.trim().toUpperCase()) : (email + ' set to direct'), 'success');
+    await loadAll(); refresh();
+  } catch(e){ if(!authGuard(e)) toast(e.message || 'Could not assign the partner.', 'error'); }
 }
 
 /* ================= CSV export ================= */

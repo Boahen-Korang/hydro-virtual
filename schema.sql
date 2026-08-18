@@ -43,6 +43,11 @@ ALTER TABLE partners ADD COLUMN IF NOT EXISTS commission NUMERIC NOT NULL DEFAUL
 ALTER TABLE partners ADD COLUMN IF NOT EXISTS revenue_cleared_at TIMESTAMPTZ;
 -- add foreign key constraint and index for partner relationship (after partners table exists)
 CREATE INDEX IF NOT EXISTS idx_users_partner ON users(partner);
+-- backfill: credit partners for signups whose ref code was stored but never
+-- attributed (idempotent; only codes that belong to a real partner)
+UPDATE users SET partner = ref
+  WHERE partner IS NULL AND ref IS NOT NULL
+    AND ref IN (SELECT code FROM partners);
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'fk_users_partner') THEN
     ALTER TABLE users ADD CONSTRAINT fk_users_partner FOREIGN KEY (partner) REFERENCES partners(code) ON DELETE SET NULL;

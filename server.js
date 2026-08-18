@@ -827,6 +827,21 @@ app.post('/api/admin/unlimited', auth('admin'), wrap(async (req, res) => {
   res.json({ ok: true, unlimitedUntil: rows[0].unlimited_until ? Number(rows[0].unlimited_until) : null });
 }));
 
+/* Assign (or clear) the partner a member is credited to. Used to fix
+   attribution by hand — e.g. signups from before referral capture worked.
+   Pass an empty partner code to make the member direct again. */
+app.patch('/api/admin/users/:email/partner', auth('admin'), wrap(async (req, res) => {
+  const email = norm(req.params.email);
+  const code = String(req.body.partner || '').trim().toUpperCase() || null;
+  if (code) {
+    const p = await query('SELECT 1 FROM partners WHERE code=$1', [code]);
+    if (!p.rows.length) return res.status(404).json({ error: 'No partner with code ' + code + '.' });
+  }
+  const { rows } = await query('UPDATE users SET partner=$2 WHERE email=$1 RETURNING email', [email, code]);
+  if (!rows.length) return res.status(404).json({ error: 'Member not found.' });
+  res.json({ ok: true, partner: code });
+}));
+
 // delete a member (keeps their transaction history)
 app.delete('/api/admin/users/:email', auth('admin'), wrap(async (req, res) => {
   const email = norm(req.params.email);
