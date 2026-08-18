@@ -1283,6 +1283,7 @@ function renderPartners(){
         ? `<button class="act approve" onclick="unlockPartner('${esc(p.code)}')">Unlock</button>`
         : `<button class="act warn" onclick="lockPartner('${esc(p.code)}')">Lock</button>`;
       actions = `<button class="act" onclick="copyRef('${esc(p.code)}')">Copy link</button>
+         <button class="act" title="Give this partner prediction credits — usable when they sign in as a member with their partner email & password" onclick="grantCredits('${esc(p.email)}')">🎟 Credits</button>
          <button class="act" title="Reset this partner's revenue & earnings to 0 (e.g. after paying them out)" onclick="clearPartnerRevenue('${esc(p.code)}')">∅ Revenue</button>
          ${lockBtn}
          <button class="act danger" onclick="deletePartner('${esc(p.code)}')">Delete</button>`;
