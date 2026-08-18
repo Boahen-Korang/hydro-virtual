@@ -8,85 +8,65 @@
 <style>
   body {
     background:
-      radial-gradient(900px 400px at 50% 0%, rgba(229,29,42,.06), transparent 60%),
-      var(--bg-base);
+      radial-gradient(900px 400px at 50% 0%, rgba(228,24,39,.05), transparent 60%),
+      var(--bg);
   }
   .auth-logo {
     display: flex; align-items: center; justify-content: center; gap: 10px;
     margin-bottom: 22px; font-weight: 800; font-size: 18px; letter-spacing: .05em;
-    color: var(--tx);
   }
   .auth-logo .logo {
     width: 36px; height: 36px; border-radius: 10px;
-    background: conic-gradient(from 200deg,var(--red),var(--green),var(--red));
+    background: conic-gradient(from 200deg,var(--green),var(--amber),var(--green));
     display: grid; place-items: center;
-    box-shadow: 0 0 20px rgba(229,29,42,.35);
+    box-shadow: 0 0 16px rgba(228,24,39,.25);
   }
   .step { display: none; }
   .step.on { display: block; }
   .auth-back {
     display: inline-flex; align-items: center; gap: 5px;
-    color: var(--tx-muted); font-size: 12px; text-decoration: none;
+    color: var(--muted); font-size: 12px; text-decoration: none;
     margin-bottom: 14px; transition: .12s;
   }
-  .auth-back:hover { color: var(--red); }
+  .auth-back:hover { color: var(--chalk); }
   .divider-or {
     display: flex; align-items: center; gap: 10px;
-    color: var(--tx-muted); font-size: 12px; margin: 16px 0;
+    color: var(--muted); font-size: 12px; margin: 16px 0;
   }
   .divider-or::before, .divider-or::after {
     content:""; flex:1; height:1px; background:var(--border);
   }
   .paystack-note {
     display: flex; align-items: center; gap: 8px;
-    background: var(--bg-surface); border: 1px solid var(--border);
+    background: var(--surface2); border: 1px solid var(--border);
     border-radius: var(--rs); padding: 10px 12px;
-    font-size: 12px; color: var(--tx-muted); margin-top: 12px;
+    font-size: 12px; color: var(--muted); margin-top: 12px;
   }
   .paystack-note .pn-icon { font-size: 18px; flex: 0 0 auto; }
   .plan-summary {
-    background: var(--bg-surface); border: 1px solid var(--border);
+    background: var(--surface2); border: 1px solid var(--border2);
     border-radius: var(--rs); padding: 12px 14px; margin-bottom: 16px;
   }
-  .plan-summary .ps-tier { font-size: 11px; color: var(--tx-faint); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+  .plan-summary .ps-tier { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
   .plan-summary .ps-name { font-size: 15px; font-weight: 700; }
-  .plan-summary .ps-price { font-family: var(--mono); color: var(--red); font-size: 13px; font-weight: 600; float: right; margin-top: -20px; }
+  .plan-summary .ps-price { font-family: var(--mono); color: var(--amber); font-size: 13px; float: right; margin-top: -20px; }
   .success-check { text-align: center; padding: 10px 0 20px; }
   .success-check .check { font-size: 52px; animation: popIn .5s cubic-bezier(.2,.9,.3,1.4); }
   @keyframes popIn { from{transform:scale(0)} to{transform:scale(1)} }
   .success-check h3 { margin: 12px 0 6px; font-size: 20px; }
   .success-check p { font-size: 13px; color: var(--muted); margin: 0; }
   .error-msg {
-    background: rgba(229,29,42,.2); border: 1.5px solid rgba(229,29,42,.6);
-    border-radius: var(--rs); padding: 12px 14px;
-    font-size: 13px; color: #FF5C5C; margin-bottom: 16px; display: none;
-    animation: slideIn .3s cubic-bezier(.2,.7,.2,1);
-    font-weight: 500;
-    box-shadow: 0 4px 12px rgba(229,29,42,.2);
-  }
-  .error-msg::before {
-    content: "⚠ ";
-    font-weight: 700;
-    margin-right: 6px;
-  }
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-8px); }
-    to { opacity: 1; transform: translateY(0); }
+    background: rgba(255,92,92,.1); border: 1px solid rgba(255,92,92,.3);
+    border-radius: var(--rs); padding: 10px 12px;
+    font-size: 12px; color: var(--red); margin-bottom: 14px; display: none;
   }
   .pw-wrap { position: relative; }
   .pw-toggle {
     position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-    background: none; border: none; color: var(--tx-muted); cursor: pointer;
+    background: none; border: none; color: var(--muted); cursor: pointer;
     font-size: 14px; padding: 4px;
   }
-  .pw-toggle:hover { color: var(--red); }
-  .form-input.error {
-    border-color: #FF5C5C !important;
-    background-color: rgba(229,29,42,.08) !important;
-  }
-  .form-input.error:focus {
-    box-shadow: 0 0 0 3px rgba(229,29,42,.25) !important;
-  }
+  .pw-toggle:hover { color: var(--chalk); }
 </style>
 </head>
 <body>
@@ -101,10 +81,10 @@
         <div class="auth-logo">
           <div class="logo">
             <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
-              <path d="M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm11 3h2v2h-2zm2-2h2v2h-2zm2 2h2v2h-2z" fill="#0C0D12"/>
+              <path d="M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm11 3h2v2h-2zm2-2h2v2h-2zm2 2h2v2h-2z" fill="#1A0509"/>
             </svg>
           </div>
-          SIGNAL
+          Virtual Oracle
         </div>
 
         <div class="auth-tabs">
@@ -116,11 +96,11 @@
         <div id="login-form" style="margin-top:20px">
           <div class="error-msg" id="login-err"></div>
           <div class="form-group">
-            <label class="form-label">Email address</label>
+            <label class="form-label" for="l-email">Email address</label>
             <input class="form-input" id="l-email" type="email" placeholder="you@example.com" autocomplete="email">
           </div>
           <div class="form-group">
-            <label class="form-label">Password</label>
+            <label class="form-label" for="l-pw">Password</label>
             <div class="pw-wrap">
               <input class="form-input" id="l-pw" type="password" placeholder="••••••••" autocomplete="current-password">
               <button class="pw-toggle" onclick="togglePw('l-pw')">👁</button>
@@ -130,7 +110,7 @@
             <a href="#" onclick="showForgot()">Forgot password?</a>
           </p>
           <button class="btn btn-primary btn-full" onclick="doLogin()">Log in</button>
-          <p style="text-align:center;font-size:12px;color:var(--tx-muted);margin-top:14px">
+          <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px">
             Don't have an account? <a href="#" onclick="showTab('register')">Register</a>
           </p>
         </div>
@@ -139,18 +119,18 @@
         <div id="forgot-form" style="display:none;margin-top:20px">
           <div class="error-msg" id="forgot-err"></div>
           <div id="forgot-ask">
-            <p style="font-size:13px;color:var(--tx-muted);margin:0 0 14px">Enter your account email and we'll send you a link to set a new password.</p>
+            <p style="font-size:13px;color:var(--muted);margin:0 0 14px">Enter your account email and we'll send you a link to set a new password.</p>
             <div class="form-group">
-              <label class="form-label">Email address</label>
+              <label class="form-label" for="f-email">Email address</label>
               <input class="form-input" id="f-email" type="email" placeholder="you@example.com" autocomplete="email">
             </div>
             <button class="btn btn-primary btn-full" id="forgot-btn" onclick="doForgot()">Send reset link</button>
           </div>
           <div id="forgot-sent" style="display:none">
             <p style="font-size:14px;margin:0 0 6px">📬 Check your inbox</p>
-            <p style="font-size:13px;color:var(--tx-muted);margin:0">If an account exists for that email, a reset link is on its way. It works for 30 minutes — check spam too.</p>
+            <p style="font-size:13px;color:var(--muted);margin:0">If an account exists for that email, a reset link is on its way. It works for 30 minutes — check spam too.</p>
           </div>
-          <p style="text-align:center;font-size:12px;color:var(--tx-muted);margin-top:14px">
+          <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px">
             <a href="#" onclick="showTab('login')">&larr; Back to log in</a>
           </p>
         </div>
@@ -158,9 +138,9 @@
         <!-- Set a new password (arrived via the emailed link) -->
         <div id="reset-form" style="display:none;margin-top:20px">
           <div class="error-msg" id="reset-err"></div>
-          <p style="font-size:13px;color:var(--tx-muted);margin:0 0 14px">Choose a new password for your account.</p>
+          <p style="font-size:13px;color:var(--muted);margin:0 0 14px">Choose a new password for your account.</p>
           <div class="form-group">
-            <label class="form-label">New password</label>
+            <label class="form-label" for="n-pw">New password</label>
             <div class="pw-wrap">
               <input class="form-input" id="n-pw" type="password" placeholder="Min. 6 characters" autocomplete="new-password">
               <button class="pw-toggle" onclick="togglePw('n-pw')">👁</button>
@@ -183,25 +163,12 @@
           <div class="form-group">
             <label class="form-label" for="r-pw">Password</label>
             <div class="pw-wrap">
-              <input class="form-input" id="r-pw" type="password" placeholder="Min. 12 characters" autocomplete="new-password">
+              <input class="form-input" id="r-pw" type="password" placeholder="Min. 6 characters" autocomplete="new-password">
               <button class="pw-toggle" onclick="togglePw('r-pw')">👁</button>
             </div>
           </div>
-          <div class="form-group">
-            <label class="form-label" for="r-pw-confirm">Confirm password</label>
-            <div class="pw-wrap">
-              <input class="form-input" id="r-pw-confirm" type="password" placeholder="Repeat your password" autocomplete="new-password">
-              <button class="pw-toggle" onclick="togglePw('r-pw-confirm')">👁</button>
-            </div>
-          </div>
-          <div class="form-group" style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px">
-            <input type="checkbox" id="r-terms" style="margin-top:4px;cursor:pointer;width:18px;height:18px">
-            <label style="font-size:13px;color:var(--tx-muted);margin:0;cursor:pointer;flex:1" for="r-terms">
-              I agree to the <a href="#" style="color:var(--red);text-decoration:none">terms and conditions</a>
-            </label>
-          </div>
           <button class="btn btn-primary btn-full" id="reg-btn" onclick="goToPlans()">Create account →</button>
-          <p style="text-align:center;font-size:12px;color:var(--tx-muted);margin-top:14px">
+          <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px">
             Already have an account? <a href="#" onclick="showTab('login')">Log in</a>
           </p>
         </div>
@@ -211,7 +178,7 @@
       <div class="step" id="step-sporty">
         <div id="sporty-form">
           <h3 style="margin:0 0 4px;font-size:18px">Connect your SportyBet account</h3>
-          <p style="font-size:13px;color:var(--tx-muted);margin:0 0 14px">Enter your SportyBet account number to link it to Virtual Oracle.</p>
+          <p style="font-size:13px;color:var(--muted);margin:0 0 14px">Enter your SportyBet account number to link it to Virtual Oracle.</p>
           <div style="text-align:center;margin:0 0 18px">
             <img src="sporty-logo.svg" alt="SportyBet" width="72" height="72" style="border-radius:14px">
           </div>
@@ -237,7 +204,7 @@
           <div class="logo-spin" style="margin:0 auto 18px">
             <img src="sporty-logo.svg" alt="SportyBet">
           </div>
-          <div style="font-size:14px;color:var(--tx-muted)">Connecting your SportyBet account…</div>
+          <div style="font-size:14px;color:var(--muted)">Connecting your SportyBet account…</div>
         </div>
 
         <div id="sporty-done" style="display:none">
@@ -378,92 +345,46 @@ async function doLogin(){
   const email = document.getElementById('l-email').value.trim();
   const pw    = document.getElementById('l-pw').value;
   const errEl = document.getElementById('login-err');
-  const emailEl = document.getElementById('l-email');
-  const pwEl = document.getElementById('l-pw');
-  const btn   = event.target;
-
   errEl.style.display = 'none';
 
   if(!email || !pw){
-    errEl.textContent = 'Please fill in all fields.';
-    errEl.style.display = '';
-    shake(emailEl);
-    return;
+    errEl.textContent = 'Please fill in all fields.'; errEl.style.display=''; return;
   }
-
-  btn.disabled = true;
-  btn.textContent = 'Logging in…';
 
   try {
     await VE.login(email, pw);
     let me = null;
     try { me = await VE.me(); } catch(e){}
     const u = (me && me.user) || {};
-    if(me && u.regFeePaid === false){
-      window.location.href = 'pricing.html'; return;
-    }
-    if(me && !u.sportyAccount){
-      showStep('step-sporty'); updateSportyHint(); return;
-    }
+    // Signup gates first: registration fee, then a linked SportyBet account
+    if(me && u.regFeePaid === false){ window.location.href = 'pricing.html'; return; }
+    if(me && !u.sportyAccount){ showStep('step-sporty'); updateSportyHint(); return; }
+    // Then: predictions left → dashboard, otherwise the packages page
     const credits = (me && me.credits) || 0;
     const unlimited = !!(u.unlimitedUntil && Date.now() < u.unlimitedUntil);
     window.location.href = (credits > 0 || unlimited) ? 'dashboard.html' : 'pricing.html';
   } catch(e){
-    btn.disabled = false;
-    btn.textContent = 'Log in';
-    errEl.textContent = e.message || 'Incorrect email or password.';
-    errEl.style.display = '';
-    emailEl.classList.add('error');
-    pwEl.classList.add('error');
-    shake(pwEl);
-    setTimeout(() => {
-      emailEl.classList.remove('error');
-      pwEl.classList.remove('error');
-    }, 2000);
+    errEl.textContent = e.message || 'Incorrect email or password.'; errEl.style.display='';
   }
 }
-
-function shake(el){
-  if(!el) return;
-  el.style.animation = 'none';
-  setTimeout(() => { el.style.animation = 'shake .4s'; }, 10);
-}
-
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
-    20%, 40%, 60%, 80% { transform: translateX(3px); }
-  }
-`;
-document.head.appendChild(style);
 
 /* ---- Register: create the account, then go straight to the packages page ---- */
 async function goToPlans(){
-  const name     = document.getElementById('r-name').value.trim();
-  const email    = document.getElementById('r-email').value.trim();
-  const pw       = document.getElementById('r-pw').value;
-  const pwConfirm = document.getElementById('r-pw-confirm').value;
-  const terms    = document.getElementById('r-terms').checked;
-  const errEl    = document.getElementById('reg-err');
-  const btn      = document.getElementById('reg-btn');
+  const name  = document.getElementById('r-name').value.trim();
+  const email = document.getElementById('r-email').value.trim();
+  const pw    = document.getElementById('r-pw').value;
+  const errEl = document.getElementById('reg-err');
+  const btn   = document.getElementById('reg-btn');
   errEl.style.display = 'none';
 
-  if(!name || !email || !pw || !pwConfirm){
+  if(!name || !email || !pw){
     errEl.textContent = 'Please fill in all fields.'; errEl.style.display=''; return;
   }
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
     errEl.textContent = 'Please enter a valid email.'; errEl.style.display=''; return;
   }
-  if(pw.length < 12){
-    errEl.textContent = 'Password must be at least 12 characters.'; errEl.style.display=''; return;
-  }
-  if(pw !== pwConfirm){
-    errEl.textContent = 'Passwords do not match.'; errEl.style.display=''; return;
-  }
-  if(!terms){
-    errEl.textContent = 'Please agree to the terms and conditions.'; errEl.style.display=''; return;
+  if(pw.length < 6){
+    errEl.textContent = 'Password must be at least 6 characters.'; errEl.style.display=''; return;
   }
 
   btn.disabled = true; btn.textContent = 'Creating account…';
@@ -549,7 +470,7 @@ function goToPayment(){
   s.innerHTML = `
     <div class="ps-tier">Your plan</div>
     <div class="ps-name">${selectedPlan.label} <span class="ps-price">GHS ${selectedPlan.price} / week</span></div>
-    <div style="font-size:11px;color:var(--tx-muted);margin-top:6px">
+    <div style="font-size:11px;color:var(--muted);margin-top:6px">
       Expires: ${new Date(Date.now() + 7*24*60*60*1000).toLocaleDateString('en-GH',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}
     </div>`;
   showStep('step-pay');
