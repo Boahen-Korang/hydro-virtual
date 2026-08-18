@@ -42,7 +42,7 @@ const SMTP_USER = process.env.SMTP_USER || '';
 const SMTP_PASS = process.env.SMTP_PASS || '';
 /* Canonical public address — used for links in emails and anywhere a
    shareable URL is produced (never the onrender.com host). */
-const PUBLIC_URL = (process.env.PUBLIC_URL || 'https://virtualsoracle.com').replace(/\/+$/, '');
+const PUBLIC_URL = (process.env.PUBLIC_URL || 'https://virtualsprime.com').replace(/\/+$/, '');
 
 /* Claude client for screenshot scanning (vision). Key lives only here, server-side. */
 let anthropic = null;
