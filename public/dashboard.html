@@ -89,7 +89,7 @@
     background: #171922;
   }
   .upload-label:hover {
-    border-color: var(--green);
+    border-color: var(--red);
     background: rgba(228,24,39,.04);
   }
   .upload-label .uz-icon { font-size: 40px; margin-bottom: 12px; display: block; }
@@ -116,7 +116,7 @@
 
   .analyze-btn {
     width: 100%; margin-top: 14px; padding: 15px;
-    background: var(--green); color: #F3F5F8;
+    background: var(--red); color: #FFFFFF;
     border: none; border-radius: 13px;
     font-size: 15px; font-weight: 900; letter-spacing: .05em;
     text-transform: uppercase; cursor: pointer; transition: .12s;
@@ -288,11 +288,11 @@
 
   .another-btn {
     width: 100%; margin-top: 12px; padding: 13px;
-    background: transparent; color: var(--green);
+    background: transparent; color: var(--red);
     border: 1.5px solid rgba(228,24,39,.35); border-radius: 13px;
     font-size: 14px; font-weight: 800; cursor: pointer; transition: .12s;
   }
-  .another-btn:hover { background: rgba(228,24,39,.07); border-color: var(--green); }
+  .another-btn:hover { background: rgba(228,24,39,.07); border-color: var(--red); }
 
   /* ---- Team inputs ---- */
   .team-inputs {
@@ -822,7 +822,7 @@ function titleCase(s){
 
 /* Drag & drop */
 const lbl = document.getElementById('upload-label');
-lbl.addEventListener('dragover',  e=>{ e.preventDefault(); lbl.style.borderColor='var(--green)'; });
+lbl.addEventListener('dragover',  e=>{ e.preventDefault(); lbl.style.borderColor='var(--red)'; });
 lbl.addEventListener('dragleave', ()=>{ lbl.style.borderColor=''; });
 lbl.addEventListener('drop', e=>{
   e.preventDefault(); lbl.style.borderColor='';
