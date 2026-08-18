@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Virtual Oracle — Login / Register</title>
+<title>VirtualPrime — Login / Register</title>
 <link rel="stylesheet" href="style.css">
 <style>
   body {
@@ -84,7 +84,7 @@
               <path d="M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm11 3h2v2h-2zm2-2h2v2h-2zm2 2h2v2h-2z" fill="#1A0509"/>
             </svg>
           </div>
-          Virtual Oracle
+          VirtualPrime
         </div>
 
         <div class="auth-tabs">
@@ -178,7 +178,7 @@
       <div class="step" id="step-sporty">
         <div id="sporty-form">
           <h3 style="margin:0 0 4px;font-size:18px">Connect your SportyBet account</h3>
-          <p style="font-size:13px;color:var(--muted);margin:0 0 14px">Enter your SportyBet account number to link it to Virtual Oracle.</p>
+          <p style="font-size:13px;color:var(--muted);margin:0 0 14px">Enter your SportyBet account number to link it to VirtualPrime.</p>
           <div style="text-align:center;margin:0 0 18px">
             <img src="sporty-logo.svg" alt="SportyBet" width="72" height="72" style="border-radius:14px">
           </div>
@@ -221,7 +221,7 @@
         <div class="success-check">
           <div class="check">✅</div>
           <h3>You're in!</h3>
-          <p>Payment confirmed. Welcome to Virtual Oracle.</p>
+          <p>Payment confirmed. Welcome to VirtualPrime.</p>
         </div>
         <a href="dashboard.html" class="btn btn-primary btn-full btn-lg">Go to dashboard →</a>
       </div>
@@ -237,12 +237,12 @@
 <script src="api.js"></script>
 <script>
 /* ================================================================
-   Virtual Oracle Auth + Payment — now backed by the API (window.VE).
+   VirtualPrime Auth + Payment — now backed by the API (window.VE).
    The Paystack public key is loaded from the server config.
    ================================================================ */
 let PAYSTACK_PUBLIC_KEY = 'pk_test_REPLACE_WITH_YOUR_PAYSTACK_PUBLIC_KEY';
 let PAY_CURRENCY = 'GHS';
-let PAY_BUSINESS = 'Virtual Oracle';
+let PAY_BUSINESS = 'VirtualPrime';
 let PAY_PROVIDER = 'paystack';
 
 let pendingUser = {};    // Holds registration data before payment
