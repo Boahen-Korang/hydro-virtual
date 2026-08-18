@@ -500,6 +500,13 @@
 </footer>
 
 <script>
+// Partner referral capture: links arrive as index.html?ref=CODE. Save the
+// code so the register flow (login.html) attributes the signup to the partner.
+try{
+  const ref = new URLSearchParams(location.search).get('ref');
+  if(ref) localStorage.setItem('ve_ref', ref.toUpperCase().replace(/[^A-Z0-9]/g,''));
+}catch(e){}
+
 // reveal-on-scroll (progressive enhancement — content is visible without this)
 const io = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
