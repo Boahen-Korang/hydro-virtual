@@ -858,7 +858,15 @@ const adminRevenueSince = async () => {
 };
 
 app.post('/api/admin/revenue-clear', auth('admin'), wrap(async (req, res) => {
-  await query('UPDATE payment_config SET revenue_cleared_at=now() WHERE id=1');
+  /* Optional `since` (ISO timestamp): set the marker to that moment instead
+     of now — purchases after it stay counted. Lets the admin e.g. clear
+     everything except the most recent transaction. */
+  const since = req.body && req.body.since ? new Date(req.body.since) : null;
+  if (since && !isNaN(since)) {
+    await query('UPDATE payment_config SET revenue_cleared_at=$1 WHERE id=1', [since]);
+  } else {
+    await query('UPDATE payment_config SET revenue_cleared_at=now() WHERE id=1');
+  }
   res.json({ ok: true });
 }));
 
