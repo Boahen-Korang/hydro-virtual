@@ -207,7 +207,7 @@
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   .field{margin-bottom:18px}
   .field.full{grid-column:1 / -1}
-  .field label{display:block;font-family:var(--ui);text-transform:uppercase;letter-spacing:.12em;
+  .field label,.field .flabel{display:block;font-family:var(--ui);text-transform:uppercase;letter-spacing:.12em;
     font-size:10px;color:var(--ash-dim);margin-bottom:8px}
   .field input,.field select{width:100%;background:rgba(243,245,248,.6);border:1px solid rgba(25,28,34,.16);
     border-radius:3px;color:var(--bone);font-family:var(--body);font-size:14px;padding:12px 13px;outline:none;transition:.15s}
@@ -508,19 +508,19 @@
         <div class="panel-body">
           <div class="form-grid">
             <div class="field">
-              <label>Partner Name</label>
+              <label for="np-name">Partner Name</label>
               <input id="np-name" type="text" placeholder="e.g. Kwame Mensah" autocomplete="off">
             </div>
             <div class="field">
-              <label>Email</label>
+              <label for="np-email">Email</label>
               <input id="np-email" type="text" placeholder="partner@email.com" autocomplete="off">
             </div>
             <div class="field">
-              <label>Password</label>
+              <label for="np-pass">Password</label>
               <input id="np-pass" type="text" placeholder="Temporary password" autocomplete="off">
             </div>
             <div class="field">
-              <label>Referral Code <span style="color:var(--ash-dim)">(optional)</span></label>
+              <label for="np-code">Referral Code <span style="color:var(--ash-dim)">(optional)</span></label>
               <input id="np-code" type="text" placeholder="Leave blank to auto-generate" autocomplete="off" spellcheck="false">
             </div>
             <div class="field full">
@@ -611,11 +611,11 @@
           <div id="scan-low" class="warn" style="display:none">⚠ Low on scans — buy more Anthropic credits at console.anthropic.com, then add the scans below.</div>
           <div class="form-grid">
             <div class="field">
-              <label>Scans remaining</label>
+              <div class="flabel">Scans remaining</div>
               <div id="scan-remaining" style="font-family:var(--display);font-weight:800;font-size:30px;color:var(--sulfur)">—</div>
             </div>
             <div class="field">
-              <label>Scans used (total)</label>
+              <div class="flabel">Scans used (total)</div>
               <div id="scan-used" style="font-family:var(--display);font-weight:800;font-size:30px;color:var(--bone)">—</div>
             </div>
           </div>
@@ -632,11 +632,11 @@
         <div class="panel-body">
           <div class="hint" style="margin-bottom:12px">How many local units equal <b>1 GHS</b>. Shown as an estimate on the packages page for users from that country — checkout still charges GHS.</div>
           <div class="form-grid">
-            <div class="field"><label>🇳🇬 Nigeria — ₦ per GHS</label><input id="fx-NGN" type="number" step="0.01" inputmode="decimal"></div>
-            <div class="field"><label>🇰🇪 Kenya — KSh per GHS</label><input id="fx-KES" type="number" step="0.01" inputmode="decimal"></div>
-            <div class="field"><label>🇹🇿 Tanzania — TSh per GHS</label><input id="fx-TZS" type="number" step="0.01" inputmode="decimal"></div>
-            <div class="field"><label>🇿🇲 Zambia — ZK per GHS</label><input id="fx-ZMW" type="number" step="0.01" inputmode="decimal"></div>
-            <div class="field"><label>🇿🇦 South Africa — R per GHS</label><input id="fx-ZAR" type="number" step="0.01" inputmode="decimal"></div>
+            <div class="field"><label for="fx-NGN">🇳🇬 Nigeria — ₦ per GHS</label><input id="fx-NGN" type="number" step="0.01" inputmode="decimal"></div>
+            <div class="field"><label for="fx-KES">🇰🇪 Kenya — KSh per GHS</label><input id="fx-KES" type="number" step="0.01" inputmode="decimal"></div>
+            <div class="field"><label for="fx-TZS">🇹🇿 Tanzania — TSh per GHS</label><input id="fx-TZS" type="number" step="0.01" inputmode="decimal"></div>
+            <div class="field"><label for="fx-ZMW">🇿🇲 Zambia — ZK per GHS</label><input id="fx-ZMW" type="number" step="0.01" inputmode="decimal"></div>
+            <div class="field"><label for="fx-ZAR">🇿🇦 South Africa — R per GHS</label><input id="fx-ZAR" type="number" step="0.01" inputmode="decimal"></div>
           </div>
           <div class="save-row"><button class="mini" type="button" onclick="saveFxRates()">Save rates</button></div>
         </div>
@@ -658,7 +658,7 @@
 
           <div class="form-grid">
             <div class="field">
-              <label>Currency</label>
+              <label for="pg-currency">Currency</label>
               <select id="pg-currency">
                 <option value="GHS">GHS — Ghana Cedi</option>
                 <option value="NGN">NGN — Nigerian Naira</option>
@@ -668,13 +668,13 @@
               </select>
             </div>
             <div class="field">
-              <label>Business / Display Name</label>
+              <label for="pg-business">Business / Display Name</label>
               <input id="pg-business" type="text" placeholder="VirtualPrime" autocomplete="off">
               <div class="hint">Shown to customers at checkout.</div>
             </div>
 
             <div class="field full">
-              <label>Payment Methods</label>
+              <div class="flabel">Payment Methods</div>
               <div class="hint" style="margin-bottom:10px">Toggle each method on or off. Buyers see every enabled method and pick one at checkout.</div>
 
               <div class="pm-card" id="pmc-paystack">
