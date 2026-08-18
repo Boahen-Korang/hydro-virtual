@@ -142,7 +142,7 @@
           <div class="form-group">
             <label class="form-label" for="n-pw">New password</label>
             <div class="pw-wrap">
-              <input class="form-input" id="n-pw" type="password" placeholder="Min. 6 characters" autocomplete="new-password">
+              <input class="form-input" id="n-pw" type="password" placeholder="Min. 12 characters" autocomplete="new-password">
               <button class="pw-toggle" onclick="togglePw('n-pw')">👁</button>
             </div>
           </div>
@@ -163,7 +163,7 @@
           <div class="form-group">
             <label class="form-label" for="r-pw">Password</label>
             <div class="pw-wrap">
-              <input class="form-input" id="r-pw" type="password" placeholder="Min. 6 characters" autocomplete="new-password">
+              <input class="form-input" id="r-pw" type="password" placeholder="Min. 12 characters" autocomplete="new-password">
               <button class="pw-toggle" onclick="togglePw('r-pw')">👁</button>
             </div>
           </div>
@@ -284,7 +284,7 @@ async function doForgot(){
   const btn = document.getElementById('forgot-btn');
   errEl.style.display = 'none';
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-    errEl.textContent = 'Please enter a valid email.'; errEl.style.display=''; return;
+    errEl.textContent = 'Please enter a valid email.'; errEl.style.display='block'; return;
   }
   btn.disabled = true; btn.textContent = 'Sending…';
   try {
@@ -292,7 +292,7 @@ async function doForgot(){
     document.getElementById('forgot-ask').style.display = 'none';
     document.getElementById('forgot-sent').style.display = '';
   } catch(e){
-    errEl.textContent = e.message || 'Could not send the reset email. Try again.'; errEl.style.display='';
+    errEl.textContent = e.message || 'Could not send the reset email. Try again.'; errEl.style.display='block';
   }
   btn.disabled = false; btn.textContent = 'Send reset link';
 }
@@ -301,8 +301,8 @@ async function doReset(){
   const errEl = document.getElementById('reset-err');
   const btn = document.getElementById('reset-btn');
   errEl.style.display = 'none';
-  if(pw.length < 6){
-    errEl.textContent = 'Password must be at least 6 characters.'; errEl.style.display=''; return;
+  if(pw.length < 12){
+    errEl.textContent = 'Password must be at least 12 characters.'; errEl.style.display='block'; return;
   }
   btn.disabled = true; btn.textContent = 'Saving…';
   try {
@@ -311,9 +311,9 @@ async function doReset(){
     showTab('login');
     const errL = document.getElementById('login-err');
     errL.textContent = '✓ Password updated — log in with your new password.';
-    errL.style.display = '';
+    errL.style.display = 'block';
   } catch(e){
-    errEl.textContent = e.message || 'Could not reset the password.'; errEl.style.display='';
+    errEl.textContent = e.message || 'Could not reset the password.'; errEl.style.display='block';
   }
   btn.disabled = false; btn.textContent = 'Set new password';
 }
@@ -348,7 +348,7 @@ async function doLogin(){
   errEl.style.display = 'none';
 
   if(!email || !pw){
-    errEl.textContent = 'Please fill in all fields.'; errEl.style.display=''; return;
+    errEl.textContent = 'Please fill in all fields.'; errEl.style.display='block'; return;
   }
 
   try {
@@ -364,7 +364,7 @@ async function doLogin(){
     const unlimited = !!(u.unlimitedUntil && Date.now() < u.unlimitedUntil);
     window.location.href = (credits > 0 || unlimited) ? 'dashboard.html' : 'pricing.html';
   } catch(e){
-    errEl.textContent = e.message || 'Incorrect email or password.'; errEl.style.display='';
+    errEl.textContent = e.message || 'Incorrect email or password.'; errEl.style.display='block';
   }
 }
 
@@ -378,13 +378,13 @@ async function goToPlans(){
   errEl.style.display = 'none';
 
   if(!name || !email || !pw){
-    errEl.textContent = 'Please fill in all fields.'; errEl.style.display=''; return;
+    errEl.textContent = 'Please fill in all fields.'; errEl.style.display='block'; return;
   }
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-    errEl.textContent = 'Please enter a valid email.'; errEl.style.display=''; return;
+    errEl.textContent = 'Please enter a valid email.'; errEl.style.display='block'; return;
   }
-  if(pw.length < 6){
-    errEl.textContent = 'Password must be at least 6 characters.'; errEl.style.display=''; return;
+  if(pw.length < 12){
+    errEl.textContent = 'Password must be at least 12 characters.'; errEl.style.display='block'; return;
   }
 
   btn.disabled = true; btn.textContent = 'Creating account…';
@@ -397,7 +397,7 @@ async function goToPlans(){
     window.location.href = 'pricing.html';
   } catch(e){
     btn.disabled = false; btn.textContent = 'Create account →';
-    errEl.textContent = e.message || 'Could not create account.'; errEl.style.display='';
+    errEl.textContent = e.message || 'Could not create account.'; errEl.style.display='block';
   }
 }
 
@@ -425,10 +425,10 @@ async function connectSporty(){
   const digits = document.getElementById('sporty-num').value.replace(/\D/g, '');
   const errEl  = document.getElementById('sporty-err');
   errEl.style.display = 'none';
-  if(!digits){ errEl.textContent = 'Please enter your SportyBet account number.'; errEl.style.display=''; return; }
+  if(!digits){ errEl.textContent = 'Please enter your SportyBet account number.'; errEl.style.display='block'; return; }
   if(digits.length !== rule.len){
     errEl.textContent = `${rule.name} numbers must be exactly ${rule.len} digits.`;
-    errEl.style.display = '';
+    errEl.style.display = 'block';
     return;
   }
   const account = cc + digits.replace(/^0/, '');   // international, e.g. +233244123456
@@ -448,7 +448,7 @@ async function connectSporty(){
     if(e && e.status === 402){ window.location.href = 'pricing.html'; return; }   // fee not paid
     document.getElementById('sporty-loading').style.display = 'none';
     document.getElementById('sporty-form').style.display = '';
-    errEl.textContent = e.message || 'Could not connect your account. Try again.'; errEl.style.display='';
+    errEl.textContent = e.message || 'Could not connect your account. Try again.'; errEl.style.display='block';
   }
 }
 
