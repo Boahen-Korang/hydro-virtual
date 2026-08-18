@@ -1,4 +1,4 @@
--- Virtual Oracle database schema
+-- VirtualPrime database schema
 -- Mirrors the former localStorage keys:
 --   ve_users -> users, ve_partners -> partners, ve_pushed -> pushed_picks,
 --   ve_purchases -> purchases, ve_results -> results, ve_credits -> credits,
@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS payment_config (
   currency    TEXT DEFAULT 'GHS',
   public_key  TEXT DEFAULT '',
   secret_key  TEXT DEFAULT '',
-  business    TEXT DEFAULT 'Virtual Oracle',
+  business    TEXT DEFAULT 'VirtualPrime',
   momo_number  TEXT DEFAULT '',
   momo_name    TEXT DEFAULT '',
   momo_network TEXT DEFAULT '',
@@ -131,6 +131,8 @@ CREATE TABLE IF NOT EXISTS payment_config (
   CONSTRAINT singleton CHECK (id = 1)
 );
 INSERT INTO payment_config (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
+-- rebrand: migrate the stored display name (idempotent)
+UPDATE payment_config SET business = 'VirtualPrime' WHERE business = 'Virtual Oracle';
 -- direct-MoMo fields on existing databases too (idempotent)
 ALTER TABLE payment_config ADD COLUMN IF NOT EXISTS momo_number  TEXT DEFAULT '';
 ALTER TABLE payment_config ADD COLUMN IF NOT EXISTS momo_name    TEXT DEFAULT '';

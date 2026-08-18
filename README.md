@@ -1,4 +1,4 @@
-# Virtual Oracle
+# VirtualPrime
 
 SportyBet Instant Virtual Football predictions. Static front-end (`public/`) served by a
 Node/Express API, backed by PostgreSQL. Built to deploy on **Render**.

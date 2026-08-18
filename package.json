@@ -1,7 +1,7 @@
 {
   "name": "virtualedge",
   "version": "1.0.0",
-  "description": "Virtual Oracle — SportyBet Instant Virtual Football predictions (static site + API on Render)",
+  "description": "VirtualPrime — SportyBet Instant Virtual Football predictions (static site + API on Render)",
   "type": "commonjs",
   "main": "server.js",
   "engines": {

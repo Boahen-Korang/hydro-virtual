@@ -1,5 +1,5 @@
 /* ================================================================
-   Virtual Oracle — pluggable payment gateways
+   VirtualPrime — pluggable payment gateways
    ----------------------------------------------------------------
    One small adapter per provider. The active provider is chosen in
    Admin → Payment Gateway and returned by /api/payment-config/public.
@@ -66,7 +66,7 @@
           customer: { email: o.email, name: o.name || '' },
           meta: o.metadata || {},
           customizations: {
-            title: cfg.business || 'Virtual Oracle',
+            title: cfg.business || 'VirtualPrime',
             description: (o.metadata && o.metadata.package) || 'Predictions package',
           },
           callback: (resp) => {
@@ -112,7 +112,7 @@
       sdk: null,
       async pay(cfg, o, h) {
         const instructions = (cfg.business && cfg.business.trim())
-          || 'Send mobile-money payment to the number provided by Virtual Oracle.';
+          || 'Send mobile-money payment to the number provided by VirtualPrime.';
         const ref = window.prompt(
           'PAYMENT INSTRUCTIONS\n\n' + instructions +
           '\n\nAmount: ' + o.currency + ' ' + o.amount +

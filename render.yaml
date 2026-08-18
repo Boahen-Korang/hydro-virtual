@@ -26,7 +26,7 @@ services:
       - key: RESEND_API_KEY
         sync: false                  # set this yourself (email confirmations); blank = emails off
       - key: MAIL_FROM
-        sync: false                  # e.g. "Virtual Oracle <noreply@yourdomain.com>"
+        sync: false                  # e.g. "VirtualPrime <noreply@yourdomain.com>"
       - key: DATABASE_SSL
         value: "on"
 
