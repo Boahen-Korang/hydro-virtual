@@ -297,8 +297,25 @@ app.post('/api/auth/login', wrap(async (req, res) => {
   const password = String(req.body.password || '');
   const { rows } = await query('SELECT * FROM users WHERE email=$1', [email]);
   const u = rows[0];
-  if (!u || !check(password, u.pw_hash)) return res.status(401).json({ error: 'Wrong email or password.' });
-  res.json({ token: sign({ email, role: 'member' }), user: userOut(u) });
+  if (u && check(password, u.pw_hash)) {
+    return res.json({ token: sign({ email, role: 'member' }), user: userOut(u) });
+  }
+  /* Approved partners can sign in here too with their partner credentials.
+     A member row is auto-provisioned on first use (same email + password
+     hash) so the whole member flow — fee, credits, purchases — works. */
+  const pq = await query('SELECT * FROM partners WHERE email=$1', [email]);
+  const p = pq.rows[0];
+  if (p && p.status === 'approved' && !p.locked && check(password, p.pw_hash)) {
+    if (u) {
+      // member row exists with a different password — partner credentials still count
+      return res.json({ token: sign({ email, role: 'member' }), user: userOut(u) });
+    }
+    const ins = await query(
+      'INSERT INTO users (email,name,pw_hash) VALUES ($1,$2,$3) RETURNING *',
+      [email, p.name || '', p.pw_hash]);
+    return res.json({ token: sign({ email, role: 'member' }), user: userOut(ins.rows[0]) });
+  }
+  return res.status(401).json({ error: 'Wrong email or password.' });
 }));
 
 /* ---- Forgot password: email a 30-minute reset link ---- */
