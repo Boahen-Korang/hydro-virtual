@@ -381,12 +381,12 @@ async function doLogin(){
     try { me = await VE.me(); } catch(e){}
     const u = (me && me.user) || {};
     // Signup gates first: registration fee, then a linked SportyBet account
-    if(me && u.regFeePaid === false){ window.location.href = 'pricing.html'; return; }
+    if(me && u.regFeePaid === false){ window.location.replace('pricing.html'); return; }
     if(me && !u.sportyAccount){ showStep('step-sporty'); updateSportyHint(); return; }
     // Then: predictions left → dashboard, otherwise the packages page
     const credits = (me && me.credits) || 0;
     const unlimited = !!(u.unlimitedUntil && Date.now() < u.unlimitedUntil);
-    window.location.href = (credits > 0 || unlimited) ? 'dashboard.html' : 'pricing.html';
+    window.location.replace((credits > 0 || unlimited) ? 'dashboard.html' : 'pricing.html');
   } catch(e){
     errEl.textContent = e.message || 'Incorrect email or password.'; errEl.style.display='block';
   }
@@ -469,7 +469,7 @@ async function connectSporty(){
       setTimeout(() => { window.location.href = 'pricing.html'; }, 2000);
     }, 1200);
   } catch(e){
-    if(e && e.status === 402){ window.location.href = 'pricing.html'; return; }   // fee not paid
+    if(e && e.status === 402){ window.location.replace('pricing.html'); return; }   // fee not paid
     document.getElementById('sporty-loading').style.display = 'none';
     document.getElementById('sporty-form').style.display = '';
     errEl.textContent = e.message || 'Could not connect your account. Try again.'; errEl.style.display='block';
@@ -591,7 +591,7 @@ async function onPaymentSuccess(ref){
     (async () => {
       let me = null;
       try { me = await VE.me(); } catch(e){}
-      if(me && me.user && me.user.regFeePaid === false){ window.location.href = 'pricing.html'; return; }
+      if(me && me.user && me.user.regFeePaid === false){ window.location.replace('pricing.html'); return; }
       showStep('step-sporty');
       updateSportyHint();
     })();

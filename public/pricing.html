@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>/* early auth guard: redirect before first paint, no history entry */
+if(!localStorage.getItem('ve_tok')) location.replace('login.html');</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VirtualPrime — Choose Package</title>
 <link rel="stylesheet" href="style.css">
@@ -479,7 +481,7 @@ let PAY_METHODS = [];         // enabled methods [{id,key}] — buyer picks one 
 
 /* ---- Auth guard ---- */
 const SESSION = (()=>{
-  if(!VE.isMember()){ window.location.href = 'login.html'; return null; }
+  if(!VE.isMember()){ window.location.replace('login.html'); return null; }
   return VE.cachedMe() || {};
 })();
 if(!SESSION) throw new Error('redirect');
