@@ -110,9 +110,9 @@
 
   .hero-sub{margin-top:22px; max-width:480px; font-size:16px; line-height:1.65; color:var(--tx-muted);}
   .hero-actions{margin-top:34px; display:flex; gap:14px; flex-wrap:wrap;}
-  .btn-primary{font-family:var(--font-mono); font-weight:600; font-size:14px; padding:15px 26px; background:var(--red); color:var(--tx); border:1px solid var(--red); display:inline-block; transition:filter .2s, transform .15s;}
+  .btn-primary{font-family:var(--font-mono); font-weight:600; font-size:14px; padding:15px 26px; background:var(--red); color:var(--tx); border:1px solid var(--red); display:inline-block; transition:filter .2s, transform .15s; cursor:pointer;}
   .btn-primary:hover{filter:brightness(1.08); transform:translateY(-1px);}
-  .btn-ghost{font-family:var(--font-mono); font-weight:600; font-size:14px; padding:15px 24px; color:var(--tx); border:1px solid var(--border); display:inline-block; transition:border-color .2s, color .2s;}
+  .btn-ghost{font-family:var(--font-mono); font-weight:600; font-size:14px; padding:15px 24px; color:var(--tx); border:1px solid var(--border); display:inline-block; transition:border-color .2s, color .2s; cursor:pointer;}
   .btn-ghost:hover{border-color:var(--red); color:var(--red);}
 
   .hero-stats{display:flex; gap:36px; margin-top:46px; padding-top:26px; border-top:1px solid var(--border); flex-wrap:wrap;}
@@ -224,7 +224,8 @@
 
   /* ===== footer ===== */
   .site-footer{border-top:1px solid var(--border); padding-top:56px;}
-  .footer-grid{display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:40px; padding-bottom:36px;}
+  .footer-grid{display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:40px; padding-bottom:36px;}
+  @media (max-width:900px){ .footer-grid{grid-template-columns:1fr 1fr; gap:28px;} }
   @media (max-width:700px){ .footer-grid{grid-template-columns:1fr; gap:28px;} }
   .footer-brand p{font-size:13.5px; color:var(--tx-muted); margin-top:10px; max-width:280px; line-height:1.6;}
   .footer-brand .logo{font-size:16px;}
@@ -478,6 +479,13 @@
         <li><a href="#how">Pipeline</a></li>
         <li><a href="#live">Live feed</a></li>
         <li><a href="#pricing">Pricing</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Accounts">
+      <p class="footer-head">Accounts</p>
+      <ul class="footer-links">
+        <li><a href="partner-login.html">Partner portal</a></li>
+        <li><a href="admin-login.html">Admin login</a></li>
       </ul>
     </nav>
     <div>
