@@ -82,7 +82,7 @@ if(!localStorage.getItem('ve_tok')) location.replace('login.html');</script>
   /* ---- Upload zone ---- */
   .upload-label {
     display: block;
-    border: 2px dashed #D0D5DC;
+    border: 2px dashed rgba(229,29,42,.35);
     border-radius: 18px;
     padding: 38px 20px;
     text-align: center;
@@ -152,8 +152,8 @@ if(!localStorage.getItem('ve_tok')) location.replace('login.html');</script>
   }
   .scan-line {
     position: absolute; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--green), transparent);
-    box-shadow: 0 0 12px var(--green);
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    box-shadow: 0 0 12px var(--red);
     animation: scandown 1.6s ease-in-out infinite;
     top: 0;
   }
@@ -165,14 +165,14 @@ if(!localStorage.getItem('ve_tok')) location.replace('login.html');</script>
   .scan-corners::before, .scan-corners::after {
     content: ""; position: absolute;
     width: 20px; height: 20px;
-    border-color: var(--green); border-style: solid;
+    border-color: var(--red); border-style: solid;
   }
   .scan-corners::before { top: 0; left: 0; border-width: 2px 0 0 2px; border-radius: 4px 0 0 0; }
   .scan-corners::after  { bottom: 0; right: 0; border-width: 0 2px 2px 0; border-radius: 0 0 4px 0; }
   .scan-corners-2::before, .scan-corners-2::after {
     content: ""; position: absolute;
     width: 20px; height: 20px;
-    border-color: var(--green); border-style: solid;
+    border-color: var(--red); border-style: solid;
   }
   .scan-corners-2::before { top: 0; right: 0; border-width: 2px 2px 0 0; border-radius: 0 4px 0 0; }
   .scan-corners-2::after  { bottom: 0; left: 0; border-width: 0 0 2px 2px; border-radius: 0 0 0 4px; }
@@ -186,10 +186,10 @@ if(!localStorage.getItem('ve_tok')) location.replace('login.html');</script>
     font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 28px;
   }
   .progress-track {
-    width: 220px; height: 4px; background: #E2E5EA; border-radius: 10px; overflow: hidden;
+    width: 220px; height: 4px; background: rgba(229,29,42,.15); border-radius: 10px; overflow: hidden;
   }
   .progress-fill {
-    height: 100%; background: var(--green);
+    height: 100%; background: var(--red);
     border-radius: 10px; width: 0%;
     box-shadow: 0 0 10px rgba(228,24,39,.5);
     transition: width .35s ease;
@@ -199,11 +199,11 @@ if(!localStorage.getItem('ve_tok')) location.replace('login.html');</script>
   }
   .loading-dots span {
     width: 7px; height: 7px; border-radius: 50%;
-    background: #D0D5DC; animation: dotpulse 1.2s ease-in-out infinite;
+    background: rgba(229,29,42,.35); animation: dotpulse 1.2s ease-in-out infinite;
   }
   .loading-dots span:nth-child(2) { animation-delay: .2s; }
   .loading-dots span:nth-child(3) { animation-delay: .4s; }
-  @keyframes dotpulse { 0%,80%,100%{background:#D0D5DC} 40%{background:var(--green)} }
+  @keyframes dotpulse { 0%,80%,100%{background:rgba(229,29,42,.35)} 40%{background:var(--red)} }
 
   /* ---- Result card ---- */
   .result-section { display: none; margin-top: 14px; }
@@ -215,8 +215,8 @@ if(!localStorage.getItem('ve_tok')) location.replace('login.html');</script>
   }
   @keyframes popUp { from{opacity:0;transform:scale(.9) translateY(16px)} to{opacity:1;transform:none} }
   .result-head {
-    background: linear-gradient(135deg, #FFFFFF, #F6F7F9);
-    padding: 14px 16px; border-bottom: 1px solid #E2E5EA;
+    background: linear-gradient(135deg, #21242F, #171922);
+    padding: 14px 16px; border-bottom: 1px solid rgba(229,29,42,.25);
     display: flex; align-items: center; gap: 10px;
   }
   .result-head .rh-icon {
@@ -274,7 +274,7 @@ if(!localStorage.getItem('ve_tok')) location.replace('login.html');</script>
     display: flex; gap: 8px; padding: 0 16px 16px; flex-wrap: wrap;
   }
   .stat-pill {
-    flex: 1; min-width: 80px; background: #F6F7F9;
+    flex: 1; min-width: 80px; background: #14151A;
     border: 1px solid rgba(229,29,42,.25); border-radius: 10px; padding: 10px 10px;
     text-align: center;
   }
@@ -282,7 +282,7 @@ if(!localStorage.getItem('ve_tok')) location.replace('login.html');</script>
   .stat-pill .sp-lbl { font-size: 10px; color: var(--muted); margin-top: 3px; letter-spacing: .06em; }
 
   .result-footer {
-    padding: 12px 16px; border-top: 1px solid #E2E5EA;
+    padding: 12px 16px; border-top: 1px solid rgba(229,29,42,.25);
     display: flex; align-items: center; gap: 10px;
   }
   .result-footer .rf-note { font-size: 11px; color: var(--muted); flex: 1; line-height: 1.4; }
