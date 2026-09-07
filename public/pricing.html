@@ -566,6 +566,16 @@ function applyLocalCurrency(sportyAccount){
     return;
   }
 
+  // Arriving from the game picker (?game=football|redblack): scope the page
+  // to that game only — preselect it and hide the game switcher entirely.
+  try{
+    const g = new URLSearchParams(location.search).get('game');
+    if(g === 'football' || g === 'redblack'){
+      setPriceGame(g);
+      const gp = document.getElementById('gpick'); if(gp) gp.style.display = 'none';
+    }
+  }catch(e){}
+
   const credits = me.credits || 0;
   const uu = (me.user && me.user.unlimitedUntil) || 0;
   const unlimited = uu && Date.now() < uu;
@@ -647,11 +657,15 @@ function selectPackage(i){
 
 /* ---- Payment ---- */
 /* Where to send the buyer once this payment lands: fee payers continue the
-   signup (connect SportyBet); package buyers go to the dashboard. */
-const postPayUrl = () => (FEE_DUE ? 'login.html#sporty' : 'dashboard.html');
+   signup (connect SportyBet); package buyers go straight to the upload page
+   of the game they paid for. */
+const postPayUrl = () => (FEE_DUE ? 'login.html#sporty'
+  : (CUR_PRICE_GAME === 'redblack' ? 'dashboard.html#redblack' : 'dashboard.html'));
 
 /* ---- Which game's pricing is on show ---- */
+let CUR_PRICE_GAME = 'football';
 function setPriceGame(g){
+  CUR_PRICE_GAME = g;
   document.getElementById('gp-football').classList.toggle('on', g === 'football');
   document.getElementById('gp-rb').classList.toggle('on', g === 'redblack');
   document.querySelector('.steps-wrap').style.display = g === 'football' ? '' : 'none';

@@ -392,10 +392,13 @@ async function doLogin(){
     // Signup gates first: registration fee, then a linked SportyBet account
     if(me && u.regFeePaid === false){ window.location.replace('pricing.html'); return; }
     if(me && !u.sportyAccount){ showStep('step-sporty'); updateSportyHint(); return; }
-    // Then: predictions left → dashboard, otherwise the packages page
+    // Then: credits in hand → that game's dashboard, otherwise the game picker
     const credits = (me && me.credits) || 0;
+    const rb = (me && me.rbCredits) || 0;
     const unlimited = !!(u.unlimitedUntil && Date.now() < u.unlimitedUntil);
-    window.location.replace((credits > 0 || unlimited) ? 'dashboard.html' : 'pricing.html');
+    if(credits > 0 || unlimited) window.location.replace('dashboard.html');
+    else if(rb > 0) window.location.replace('dashboard.html#redblack');
+    else window.location.replace('games.html');
   } catch(e){
     errEl.textContent = e.message || 'Incorrect email or password.'; errEl.style.display='block';
   }
@@ -475,7 +478,7 @@ async function connectSporty(){
       document.getElementById('sporty-loading').style.display = 'none';
       document.getElementById('sporty-done').style.display = '';
       toast('Sporty account connected successfully', 'success');
-      setTimeout(() => { window.location.href = 'pricing.html'; }, 2000);
+      setTimeout(() => { window.location.href = 'games.html'; }, 2000);
     }, 1200);
   } catch(e){
     if(e && e.status === 402){ window.location.replace('pricing.html'); return; }   // fee not paid

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script>/* early auth guard: redirect before first paint, no history entry */
+if(!localStorage.getItem('ve_tok')) location.replace('login.html');</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VirtualPrime — Choose Your Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Oswald:wght@400;500;600&family=Spectral:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0C0D12; --panel:#171922; --panel2:#21242F; --crimson:#E51D2A; --blood:#E51D2A;
+    --gore:#2E323F; --bone:#FFFFFF; --ash:#A0A5B8; --ash-dim:#6B7080;
+    --display:'Cinzel',Georgia,serif; --body:'Spectral',Georgia,serif; --ui:'Oswald','Arial Narrow',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:
+      radial-gradient(1100px 620px at 50% -240px, rgba(229,29,42,.14), transparent 62%),
+      radial-gradient(1100px 900px at 0% 102%, rgba(229,29,42,.16), transparent 60%),
+      var(--void);
+    background-attachment:fixed;
+    color:var(--bone);font-family:var(--body);min-height:100vh;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+
+  .top{display:flex;align-items:center;gap:10px;padding:15px 22px;background:var(--crimson);
+    color:#fff;box-shadow:0 2px 12px rgba(0,0,0,.35)}
+  .top .di{font-size:13px}
+  .top .brand{font-family:var(--display);font-weight:900;font-size:16px;letter-spacing:.08em}
+  .top .spacer{flex:1}
+  .top button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.5);
+    border-radius:4px;color:#fff;font-family:var(--ui);font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;padding:8px 13px;cursor:pointer;transition:.15s}
+  .top button:hover{background:rgba(255,255,255,.3)}
+
+  .wrap{max-width:1000px;margin:0 auto;padding:46px 20px 70px}
+  .eyebrow{font-family:var(--ui);font-size:11px;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--crimson);display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:12px}
+  .eyebrow::before,.eyebrow::after{content:"";width:26px;height:1px;background:var(--crimson)}
+  h1{text-align:center;font-family:var(--display);font-size:clamp(26px,4.4vw,40px);font-weight:700;margin-bottom:10px}
+  .lead{text-align:center;color:var(--ash);font-size:15px;line-height:1.6;max-width:560px;margin:0 auto 38px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:22px}
+  .card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid rgba(229,29,42,.25);
+    border-radius:14px;position:relative;overflow:hidden;
+    transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;
+    display:flex;flex-direction:column;cursor:pointer}
+  .card:hover{transform:translateY(-4px);border-color:var(--crimson);
+    box-shadow:0 18px 44px -22px rgba(0,0,0,.6),0 0 30px -14px rgba(229,29,42,.55)}
+  .card:focus-visible{outline:2px solid var(--crimson);outline-offset:3px}
+
+  /* Artwork banner — logos are shown whole (contained, never cropped) */
+  .logo{width:100%;min-height:150px;display:grid;place-items:center;font-size:64px;padding:14px;
+    background:rgba(12,13,18,.55);border-bottom:1px solid rgba(229,29,42,.2)}
+  .logo img{max-width:100%;max-height:250px;width:auto;height:auto;display:block;border-radius:8px}
+  .logo.soon{filter:grayscale(1);opacity:.55}
+  .cbody{padding:20px 22px 22px;display:flex;flex-direction:column;flex:1}
+  .card h2{font-family:var(--display);font-size:19px;margin-bottom:7px}
+  .card p{color:var(--ash);font-size:14px;line-height:1.6;flex:1}
+
+  .badge{display:inline-flex;align-items:center;gap:7px;margin-top:14px;font-family:var(--ui);
+    font-size:12px;font-weight:600;letter-spacing:.06em;padding:8px 13px;border-radius:24px;width:fit-content}
+  .badge.has{color:var(--crimson);background:rgba(229,29,42,.1);border:1px solid rgba(229,29,42,.4)}
+  .badge.none{color:var(--ash-dim);background:rgba(12,13,18,.6);border:1px solid var(--gore)}
+  .badge.soon{color:var(--ash-dim);background:rgba(12,13,18,.6);border:1px solid var(--gore)}
+
+  .cta{margin-top:14px;padding:13px;text-align:center;font-family:var(--ui);font-size:12.5px;
+    font-weight:600;letter-spacing:.12em;text-transform:uppercase;border-radius:6px;
+    background:linear-gradient(180deg,#FF3B47,var(--crimson));color:#fff;border:1px solid var(--crimson);transition:.15s}
+  .card:hover .cta{filter:brightness(1.08)}
+  .cta.ghost{background:transparent;color:var(--bone);border-color:var(--gore)}
+  .card:hover .cta.ghost{border-color:var(--crimson);color:var(--crimson)}
+
+  .card.disabled{cursor:not-allowed;opacity:.72}
+  .card.disabled:hover{transform:none;border-color:rgba(229,29,42,.25);box-shadow:none}
+  .flag{position:absolute;top:12px;left:12px;z-index:2;font-family:var(--ui);font-size:9px;font-weight:600;
+    letter-spacing:.16em;padding:4px 9px;border-radius:20px;background:rgba(12,13,18,.85);
+    border:1px solid rgba(229,29,42,.4);color:var(--crimson)}
+
+  .dash-row{text-align:center;margin-top:34px}
+  .dash-btn{display:inline-block;font-family:var(--ui);font-size:13px;font-weight:600;letter-spacing:.1em;
+    text-transform:uppercase;padding:15px 34px;border-radius:7px;
+    background:linear-gradient(180deg,#FF3B47,var(--crimson));color:#fff;border:1px solid var(--crimson);
+    cursor:pointer;transition:box-shadow .2s,transform .15s}
+  .dash-btn:hover{box-shadow:0 0 26px rgba(229,29,42,.5);transform:translateY(-2px)}
+
+  .note{text-align:center;color:var(--ash-dim);font-family:var(--ui);font-size:11.5px;
+    letter-spacing:.06em;margin-top:30px;line-height:1.8}
+  .loading{text-align:center;color:var(--ash);padding:60px 0;font-family:var(--ui);font-size:13px;letter-spacing:.1em}
+  .err{max-width:520px;margin:0 auto;background:rgba(229,29,42,.1);border:1px solid rgba(229,29,42,.4);
+    color:#FF6B75;border-radius:8px;padding:14px 16px;font-size:13.5px;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <span class="di">◆</span><span class="brand">VIRTUALPRIME</span>
+  <span class="spacer"></span>
+  <button onclick="signOut()">Sign out</button>
+</div>
+
+<div class="wrap">
+  <p class="eyebrow">Step 1</p>
+  <h1>Choose Your Game</h1>
+  <p class="lead">Each game has its own credits and its own reader. Pick the one you're playing —
+     credits you buy for a game are spent only on that game.</p>
+
+  <div id="content"><div class="loading">LOADING GAMES…</div></div>
+</div>
+
+<script src="api.js"></script>
+<script>
+"use strict";
+
+function signOut(){ VE.signOutMember(); location.replace('login.html'); }
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* The two live games, wired to this site's credit pools, plus the
+   coming-soon artwork. Tap a card: credits in hand -> that game's
+   dashboard; none yet -> the pricing page scoped to that game. */
+function cardFor(g){
+  const label = g.unlimited && !g.credits ? 'Unlimited · 24h'
+    : g.credits + ' credit' + (g.credits === 1 ? '' : 's');
+  const has = g.credits > 0 || g.unlimited;
+  const href = has ? g.playHref : ('pricing.html?game=' + g.id);
+  return `
+    <a class="card" href="${href}">
+      <div class="logo"><img src="${g.art}" alt="${esc(g.label)}" loading="lazy"></div>
+      <div class="cbody">
+        <h2>${esc(g.label)}</h2>
+        <p>${esc(g.blurb)}</p>
+        <span class="badge ${has ? 'has' : 'none'}">${has ? '● ' + esc(label) : '○ No credits yet'}</span>
+        <div class="cta ${has ? '' : 'ghost'}">${has ? 'PLAY →' : 'GET CREDITS'}</div>
+      </div>
+    </a>`;
+}
+
+function soonCard(g){
+  return `
+    <div class="card disabled" aria-disabled="true">
+      <span class="flag">COMING SOON</span>
+      <div class="logo soon"><img src="${g.art}" alt="${esc(g.label)}" loading="lazy"></div>
+      <div class="cbody">
+        <h2>${esc(g.label)}</h2>
+        <p>Not open yet. It'll appear here the moment it is.</p>
+        <span class="badge soon">○ Unavailable</span>
+      </div>
+    </div>`;
+}
+
+async function load(){
+  const box = document.getElementById('content');
+  try {
+    const me = await VE.me();
+    const u = (me && me.user) || {};
+    const unlimited = !!(u.unlimitedUntil && Date.now() < u.unlimitedUntil);
+    const football = Number(me.credits) || 0;
+    const rb = Number(me.rbCredits) || 0;
+
+    const games = [
+      { id:'football', label:'Instant Football', art:'oo.jpg', credits:football, unlimited,
+        playHref:'dashboard.html',
+        blurb:'Upload a SportyBet Instant Football screenshot and get the likely outcomes for the next rounds.' },
+      { id:'redblack', label:'Red & Black', art:'casino.jpeg', credits:rb, unlimited:false,
+        playHref:'dashboard.html#redblack',
+        blurb:'Feed in the round history and get the next colours — jokers included.' },
+    ];
+    const soon = [
+      { id:'spin', label:'Spin da Bottle', art:'spin-da-bottle.png' },
+      { id:'aviator', label:'Aviator', art:'avi.png' },
+    ];
+
+    const anyCredits = football > 0 || rb > 0 || unlimited;
+    const first = games.find(g => g.credits > 0 || g.unlimited);
+
+    box.innerHTML =
+      '<div class="grid">' + games.map(cardFor).join('') + soon.map(soonCard).join('') + '</div>' +
+      (anyCredits && first
+        ? '<div class="dash-row"><button class="dash-btn" onclick="location.href=\'' + first.playHref + '\'">GO TO DASHBOARD →</button></div>'
+        : '') +
+      '<p class="note">Credits are per game and are not transferable.<br>18+ only · outcomes are random · play responsibly</p>';
+  } catch(e){
+    if(e && e.status === 401){ VE.signOutMember(); location.replace('login.html'); return; }
+    box.innerHTML = '<div class="err">' + esc(e.message || 'Could not load games.') + '</div>';
+  }
+}
+
+(function init(){
+  if(!VE.isMember()){ location.replace('login.html'); return; }
+  load();
+})();
+</script>
+</body>
+</html>
