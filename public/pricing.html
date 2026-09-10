@@ -901,7 +901,7 @@ function momoCopy(btn){
 
 /* ---- Direct bank transfer: same claim flow, bank details instead of a wallet ---- */
 let bankSelIdx = 0;
-function openBankModal(pkg){ bankSelIdx = 0; BANK_PROOF = ''; renderBankForm(pkg); }
+function openBankModal(pkg){ bankSelIdx = 0; BANK_PROOF = ''; BANK_SENDER = ''; renderBankForm(pkg); }
 
 /* What the buyer must actually send: their local currency when we know it
    (e.g. ₦ for +234 numbers, from the admin-set rates), else GHS. */
@@ -940,8 +940,10 @@ function renderBankForm(pkg){
     </div>
     <ol class="momo-steps">
       <li>Transfer <b>${esc(amt)}</b> to the account above from your banking app${a.bank ? ' (' + esc(a.bank) + ')' : ''}.</li>
-      <li>Attach a <b>screenshot of the receipt</b> — your predictions are added once the payment is confirmed.</li>
+      <li>Enter the <b>name on the bank account you paid from</b> and attach a <b>screenshot of the receipt</b> — your predictions are added once the payment is confirmed.</li>
     </ol>
+    <label class="momo-label" for="bank-sender">Name on your bank account</label>
+    <input class="momo-input" id="bank-sender" type="text" placeholder="e.g. ADEBAYO JOHN OLU" autocomplete="name" value="${esc(BANK_SENDER)}">
     <label class="momo-label" for="bank-proof">Receipt screenshot</label>
     <input class="momo-input" id="bank-proof" type="file" accept="image/*" style="padding:10px 14px">
     <div id="bank-proof-prev" style="display:none;margin:-6px 0 14px"><img style="max-width:100%;max-height:150px;border-radius:6px;border:1px solid rgba(229,29,42,.25)"></div>
@@ -958,6 +960,7 @@ function renderBankForm(pkg){
     pv.querySelector('img').src = BANK_PROOF;
     pv.style.display = '';
   }
+  document.getElementById('bank-sender').addEventListener('input', function(){ BANK_SENDER = this.value; });
   document.getElementById('bank-proof').addEventListener('change', async function(){
     BANK_PROOF = '';
     const f = this.files && this.files[0];
@@ -975,6 +978,7 @@ function renderBankForm(pkg){
    Loads via FileReader/data: URL — blob: URLs were blocked by the site's
    Content-Security-Policy, which silently broke every receipt upload. */
 let BANK_PROOF = '';
+let BANK_SENDER = '';
 function imageToDataUrl(file){
   return new Promise((resolve, reject) => {
     const fr = new FileReader();
@@ -996,6 +1000,8 @@ function imageToDataUrl(file){
 }
 
 async function bankSubmit(pkg){
+  const sender = BANK_SENDER.trim();
+  if(sender.length < 4){ toast('Enter the name on the bank account you paid from.', 'error'); const i=document.getElementById('bank-sender'); if(i) i.focus(); return; }
   if(!BANK_PROOF){ toast('Attach a screenshot of your transfer receipt.', 'error'); return; }
   const btn = document.getElementById('momo-send');
   btn.disabled = true; btn.textContent = 'Submitting…';
@@ -1006,7 +1012,7 @@ async function bankSubmit(pkg){
       credits: pkg.preds === 999 ? 9999 : pkg.preds,
       // tell the admin which bank to check and the local amount actually sent
       amount: localAmount(pkg) + ' · Bank' + (acc.bank ? ' — ' + acc.bank : ''),
-      txid: '',
+      txid: sender,
       method: 'bank',
       proof: BANK_PROOF,
     });

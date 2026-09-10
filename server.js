@@ -493,9 +493,14 @@ app.post('/api/me/manual-claims', auth('member'), wrap(async (req, res) => {
   const amount = String(req.body.amount || '').slice(0, 80);
   const txid = String(req.body.txid || '').trim().slice(0, 80);
   const method = String(req.body.method || '').slice(0, 10);
-  // Bank transfers are verified by the receipt screenshot alone — no reference needed.
-  // MoMo payments are matched by the sender's registered MoMo name (stored in txid).
-  if (method !== 'bank' && txid.length < 4) return res.status(400).json({ error: 'Enter the name on the MoMo number you paid from.' });
+  // MoMo payments are matched by the sender's registered MoMo name; bank
+  // transfers by the sender's bank-account name PLUS the receipt screenshot.
+  // Both live in txid so the admin panel shows them in the sender column.
+  if (txid.length < 4) {
+    return res.status(400).json({ error: method === 'bank'
+      ? 'Enter the name on the bank account you paid from.'
+      : 'Enter the name on the MoMo number you paid from.' });
+  }
 
   // Receipt screenshot: required for bank transfers (no SMS lands on our side)
   let proof = String(req.body.proof || '');
